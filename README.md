@@ -1,12 +1,36 @@
 # Lt. Island Tides
 
-When is the road to Lieutenant Island (Wellfleet, MA) under water? Live at
-**https://aliabuckner1.github.io/lieutenant-island/** (the old ltisland.netlify.app link forwards there).
+**When is the road to Lieutenant Island (Wellfleet, MA) under water?**
+Live at **https://aliabuckner1.github.io/lieutenant-island/**. The short link **https://ltisland.netlify.app** forwards there.
 
-The page runs entirely in the browser. On every load it fetches NOAA tide predictions, the live Boston tide gauge,
-the NWS wind forecast and Open-Meteo pressure, works out how much extra water they add to the tide chart, and compares
-the result with the road's low point: 10.4 ft above MLLW, from airborne lidar, known to about ±6 in. No server, no
-build step.
+Residents of Lieutenant Island use printed tide calendars, built from NOAA's predictions for Wellfleet, to know when the road on
+and off the island will be flooded. Those predictions have grown less reliable. They're pinned to 1983–2001 sea level, and the
+sea at Boston is about 6½ inches higher now. They leave out wind and air pressure. And Wellfleet has no tide gauge of its own,
+so its numbers are Boston's, scaled and shifted. Today 94% of high tides come in above the prediction, by about 8 inches on
+average.
+
+This site corrects for that. It adds today's sea level and a weather model (National Weather Service wind, Open-Meteo pressure)
+built from more than 3,000 past high tides, leans on NOAA's live Boston tide gauge for the next day or so, and compares the
+result with the road's height from USGS airborne lidar. Islanders can also report what they see at the road. Reports are
+recorded in a Google Sheet and can help pin down the road's real height and check the forecast against what actually happens at
+Wellfleet, so the model can be improved over time.
+
+## How well it works
+
+Replaying about 900 high tides from 2024–26 with the weather forecasts available at the time, against what Boston's tide gauge
+measured:
+
+| Forecast | Typical error |
+|---|---|
+| NOAA's prediction (what the calendars use) | about 9 in |
+| This site, a day ahead | about 4 in |
+| This site, a week ahead | about 5 in |
+
+## How it works
+
+The page runs entirely in the browser. On every load it fetches NOAA tide predictions, the live Boston tide gauge, the NWS wind
+forecast and Open-Meteo pressure, then compares the result with the road's low point: 10.4 ft above MLLW, known to about ±6 in.
+No server and no build step.
 
 ## What's where
 

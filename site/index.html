@@ -43,8 +43,8 @@
 .top .x{margin-top:2px}
 .top .x .ic{width:19px;height:19px}
 .about p{font-size:14.5px;color:var(--ink-2);margin:8px 0 0;line-height:1.5}
-.about ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:var(--ink-2);line-height:1.45}
-.about li{margin-top:4px}
+.callout{margin-top:20px;background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.callout b{color:var(--ink)}
 .about b{color:var(--ink)}
 
 /* ---- tap a tide for details ---- */
@@ -234,10 +234,17 @@ var XIC='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12
 var PIN='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
 function show(html){
   el("sheetBody").innerHTML=html;
-  if(!sheet.open){if(sheet.showModal)sheet.showModal();else sheet.setAttribute("open","");}
+  if(!sheet.open){openedByTap=lastTap;if(sheet.showModal)sheet.showModal();else sheet.setAttribute("open","");}
   sheet.scrollTop=0;
 }
 function hide(){if(sheet.close)sheet.close();else sheet.removeAttribute("open");}
+/* after a tap, closing the sheet shouldn't leave the browser's blue focus outline on whatever opened it; keyboard users keep it */
+var lastTap=false,openedByTap=false;
+document.addEventListener("pointerdown",function(){lastTap=true;},true);
+document.addEventListener("keydown",function(){lastTap=false;},true);
+sheet.addEventListener("close",function(){
+  if(openedByTap)setTimeout(function(){var a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur();},0);
+});
 function headHTML(kicker,title){
   return '<div class="grab" aria-hidden="true"></div><div class="shhead"><div><div class="kicker">'+kicker+'</div>'+
     '<h2 id="sheetTitle">'+title+'</h2></div><button class="x" type="button" data-act="close" aria-label="Close">'+XIC+'</button></div>';
@@ -257,22 +264,23 @@ el("aboutBtn").addEventListener("click",openAbout);
 
 /* ---- about this page ---- */
 function openAbout(){
+  CTX=null;  /* a report started from here isn't about a particular tide */
   show(headHTML("About this page","Why we made it")+'<div class="about">'+
-    '<p>The printed tide calendar most of the island uses has NOAA’s predictions for Wellfleet, which assume sea level as it was in 1983–2001. '+
-      'Sea level at Boston has risen about 6½ inches since then, so high tides now come in around 8–9 inches higher than the calendar says. '+
-      'When wind and weather push extra water in, it’s higher still. That’s why rules of thumb like “the road floods at 9.5 feet” stopped matching.</p>'+
-    '<div class="sec"><h3>What it does differently</h3><ul>'+
-      '<li>Starts from NOAA’s predictions and adds today’s higher sea level</li>'+
-      '<li>Adjusts for the wind (National Weather Service forecast) and air pressure (Open-Meteo)</li>'+
-      '<li>For the next day or so, leans on what NOAA’s Boston tide gauge is actually measuring (Wellfleet has no gauge)</li>'+
-      '<li>Compares the result with the height of the road, measured by USGS airborne laser mapping</li></ul></div>'+
-    '<div class="sec"><h3>How much better is it?</h3><p>We replayed 2024–26 high tides:</p><ul>'+
-      '<li>A typical tide was about <b>9 inches</b> off the calendar. This page is about <b>4 inches</b> off a day ahead (less within a few hours) and about 5 inches a week ahead.</li>'+
-      '<li>For tides near the road’s height, the calendar got “does the road flood?” wrong about <b>2 times in 5</b>. This page gets it wrong about <b>1 time in 7</b>.</li></ul>'+
-      '<p>Big storms still tend to come in higher than forecast, and the road’s height is only known to about ±6 inches, so give yourself some margin. Road reports help pin that down.</p></div>'+
-    '<div class="sec"><h3>A tide fact</h3><p>In Wellfleet the tide goes out more slowly than it comes in: about 6 hours rising, but about 6½ hours falling. '+
-      'So the road tends to stay covered a little longer after high tide than before it.</p></div>'+
-    '</div><button class="btn wide" type="button" data-act="close">Done</button>');
+    '<p>Most of us plan around the printed tide calendar, which uses NOAA’s tide predictions for Wellfleet. Those predictions are a rough guide at best, and they’ve been getting rougher. '+
+      'They’re pinned to average sea level from 1983–2001, and the sea at Boston has risen about 6½ inches since then. '+
+      'Today 94% of high tides come in higher than predicted, by about 8 inches on average, and the gap keeps growing. '+
+      'That’s why rules of thumb like “the road floods at 9.5 feet” have become less and less reliable.</p>'+
+    '<p>On top of that, the predictions ignore the weather: a strong northeast wind alone can add about 10 inches, and a strong southwest wind can take away about as much.</p>'+
+    '<div class="sec"><h3>How this page is more accurate</h3>'+
+      '<p>It starts from NOAA’s predictions and adds today’s higher sea level and the latest wind and pressure forecasts (from the National Weather Service and Open-Meteo), using a model built from more than 3,000 past high tides. '+
+        'For tides within the next 24 hours or so, it also leans on what the Boston tide gauge is measuring right now.</p>'+
+      '<p>We tested it by replaying about 900 high tides from 2024–26 with the forecasts available at the time. '+
+        'Against what Boston’s tide gauge actually measured, NOAA’s predictions were typically about 9 inches off; this page was about 4 inches off a day ahead and about 5 inches a week ahead.</p>'+
+      '<p>It also accounts for something few people know: Wellfleet’s tide goes out more slowly than it comes in, about 6½ hours falling versus 6 rising, so the road tends to stay covered a little longer after high tide than before it.</p></div>'+
+    '<div class="callout"><b>Seem off?</b> There’s no tide gauge at Wellfleet (NOAA’s numbers here are Boston’s, 60 miles away, adjusted), so reports from the road are our only real check. '+
+      'If the road ever doesn’t match this page, please tap <b>Report the road</b>. Every report helps make the forecast more accurate.</div>'+
+    '</div><button class="btn wide" type="button" data-act="report">'+PIN+'Report the road</button>'+
+    '<button class="btn wide" type="button" data-act="close">Done</button>');
 }
 
 /* ---- details for one tide ---- */
