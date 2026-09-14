@@ -1,0 +1,146 @@
+[
+{
+"peak": "2026-09-03T04:18",
+"pk": 10.43,
+"cat": "knife",
+"first": "04:12",
+"last": "04:30",
+"arrive": "03:42",
+"dark": true
+},
+{
+"peak": "2026-09-04T05:18",
+"pk": 10.05,
+"cat": "dry",
+"first": null,
+"last": null,
+"arrive": "04:48",
+"dark": true
+},
+{
+"peak": "2026-09-07T08:36",
+"pk": 9.91,
+"cat": "dry",
+"first": null,
+"last": null,
+"arrive": "08:06",
+"dark": false
+},
+{
+"peak": "2026-09-08T09:36",
+"pk": 10.33,
+"cat": "knife",
+"first": null,
+"last": null,
+"arrive": "09:06",
+"dark": false
+},
+{
+"peak": "2026-09-09T10:36",
+"pk": 10.85,
+"cat": "wet",
+"first": "09:48",
+"last": "11:30",
+"arrive": "09:18",
+"dark": false
+},
+{
+"peak": "2026-09-15T02:54",
+"pk": 10.75,
+"cat": "wet",
+"first": "02:12",
+"last": "03:36",
+"arrive": "01:42",
+"dark": true
+},
+{
+"peak": "2026-09-16T03:36",
+"pk": 10.2,
+"cat": "knife",
+"first": null,
+"last": null,
+"arrive": "03:06",
+"dark": true
+},
+{
+"peak": "2026-09-17T16:36",
+"pk": 10.52,
+"cat": "knife",
+"first": "16:12",
+"last": "17:06",
+"arrive": "15:42",
+"dark": false
+},
+{
+"peak": "2026-09-18T17:30",
+"pk": 10.2,
+"cat": "knife",
+"first": null,
+"last": null,
+"arrive": "17:00",
+"dark": false
+},
+{
+"peak": "2026-09-19T18:24",
+"pk": 10.01,
+"cat": "dry",
+"first": null,
+"last": null,
+"arrive": "17:54",
+"dark": false
+},
+{
+"peak": "2026-09-20T19:24",
+"pk": 9.99,
+"cat": "dry",
+"first": null,
+"last": null,
+"arrive": "18:54",
+"dark": false
+},
+{
+"peak": "2026-09-21T20:24",
+"pk": 10.14,
+"cat": "dry",
+"first": null,
+"last": null,
+"arrive": "19:54",
+"dark": true
+},
+{
+"peak": "2026-09-22T21:18",
+"pk": 10.41,
+"cat": "knife",
+"first": "21:06",
+"last": "21:24",
+"arrive": "20:36",
+"dark": true
+},
+{
+"peak": "2026-09-23T22:06",
+"pk": 10.75,
+"cat": "wet",
+"first": "21:18",
+"last": "22:48",
+"arrive": "20:48",
+"dark": true
+},
+{
+"peak": "2026-09-24T10:36",
+"pk": 10.3,
+"cat": "knife",
+"first": null,
+"last": null,
+"arrive": "10:06",
+"dark": false
+},
+{
+"peak": "2026-09-25T11:12",
+"pk": 10.83,
+"cat": "wet",
+"first": "10:30",
+"last": "12:00",
+"arrive": "10:00",
+"dark": false
+}
+]

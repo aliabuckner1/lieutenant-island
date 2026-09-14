@@ -1,0 +1,275 @@
+<title>Causeway Field Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#EDF2F3; --surface:#FFFFFF; --surface-2:#F1F6F7; --sunk:#E4ECEE;
+  --ink:#0B1B21; --ink-2:#2C4854; --muted:#5C7883; --rule:#C9D7DB; --rule-2:#DEE8EA;
+  --accent:#08616D; --accent-ink:#FFFFFF; --accent-soft:#08616d14;
+  --dry:#0ca30c; --wet:#c07a05; --dry-soft:#0ca30c1a; --wet-soft:#fab2192b;
+  --shadow:0 1px 2px #0b1b2114, 0 6px 18px #0b1b210f;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --body:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --display:"Bitter",Georgia,serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#08151A; --surface:#102026; --surface-2:#162C34; --sunk:#0C1B21;
+  --ink:#E9F1F3; --ink-2:#B6C9D0; --muted:#88A2AB; --rule:#24404A; --rule-2:#1C333B;
+  --accent:#4FB6C4; --accent-ink:#06171B; --accent-soft:#4fb6c41f;
+  --dry:#3ec03e; --wet:#e8b13a; --dry-soft:#3ec03e26; --wet-soft:#e8b13a26;
+  --shadow:0 1px 2px #0007, 0 8px 22px #00000059;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#08151A; --surface:#102026; --surface-2:#162C34; --sunk:#0C1B21;
+  --ink:#E9F1F3; --ink-2:#B6C9D0; --muted:#88A2AB; --rule:#24404A; --rule-2:#1C333B;
+  --accent:#4FB6C4; --accent-ink:#06171B; --accent-soft:#4fb6c41f;
+  --dry:#3ec03e; --wet:#e8b13a; --dry-soft:#3ec03e26; --wet-soft:#e8b13a26;
+  --shadow:0 1px 2px #0007, 0 8px 22px #00000059;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:660px;margin:0 auto;padding:0 16px 80px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500}
+
+header{padding:30px 0 18px}
+header h1{font-size:31px;font-weight:700;letter-spacing:-.02em;line-height:1.08;margin-top:6px}
+header p{margin:10px 0 0;color:var(--ink-2);font-size:16px}
+
+/* ---- the three rules ---- */
+.rules{margin-top:22px;display:grid;gap:10px}
+.rule{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--accent);
+  border-radius:9px;padding:14px 16px;box-shadow:var(--shadow)}
+.rule b{display:block;font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:3px}
+.rule span{font-size:14.5px;color:var(--ink-2)}
+
+h2.sec{font-size:14px;font-family:var(--mono);font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:38px 0 12px;
+  padding-bottom:8px;border-bottom:1px solid var(--rule)}
+
+/* ---- tide cards ---- */
+.tide{background:var(--surface);border:1px solid var(--rule);border-radius:11px;margin-bottom:10px;
+  box-shadow:var(--shadow);overflow:hidden}
+.tide.done{border-color:var(--accent)}
+.thead{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+  padding:14px 16px;cursor:pointer;user-select:none}
+.thead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tdate{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.01em}
+.twhen{font-family:var(--mono);font-size:13.5px;color:var(--ink-2);margin-top:3px;
+  font-variant-numeric:tabular-nums}
+.twhen b{color:var(--ink);font-weight:600}
+.badge{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:5px 9px;border-radius:99px;white-space:nowrap;text-align:center}
+.b-knife{background:var(--accent);color:var(--accent-ink)}
+.b-wet{background:var(--wet-soft);color:var(--wet);border:1px solid currentColor}
+.b-dry{background:var(--dry-soft);color:var(--dry);border:1px solid currentColor}
+.tick{font-size:15px;color:var(--accent);font-weight:700}
+.tbody{display:none;padding:2px 16px 16px;border-top:1px solid var(--rule-2);background:var(--surface-2)}
+.tide.open .tbody{display:block}
+.detail{font-size:13.5px;color:var(--muted);font-family:var(--mono);margin:12px 0 14px;
+  padding:10px 12px;background:var(--sunk);border-radius:7px;line-height:1.7}
+.detail b{color:var(--ink-2)}
+.field{display:grid;grid-template-columns:1fr;gap:5px;margin-bottom:13px}
+.field label{font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.field input[type=time],.field input[type=text]{font-family:var(--mono);font-size:17px;
+  padding:11px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
+  color:var(--ink);width:100%;min-height:46px}
+.field input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.check{display:flex;align-items:center;gap:11px;padding:11px 0;font-size:15px;color:var(--ink-2);cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+
+/* ---- setup checklist ---- */
+.setup{background:var(--surface);border:1px solid var(--rule);border-radius:11px;padding:6px 16px 12px;
+  box-shadow:var(--shadow)}
+.setup .check{border-bottom:1px solid var(--rule-2)}
+.setup .check:last-child{border-bottom:0}
+.setup .check span small{display:block;color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px}
+
+/* ---- log ---- */
+textarea{width:100%;min-height:190px;font-family:var(--mono);font-size:13px;padding:13px;
+  border:1px solid var(--rule);border-radius:9px;background:var(--surface);color:var(--ink);line-height:1.6}
+button{font-family:var(--body);font-size:15px;font-weight:600;padding:12px 18px;border-radius:9px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;min-height:46px}
+button.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+
+.warn{margin-top:16px;background:var(--wet-soft);border:1px solid var(--wet);border-radius:11px;padding:16px}
+.warn b{font-family:var(--display);font-size:16px;display:block;margin-bottom:5px}
+.warn p{margin:0;font-size:14.5px;color:var(--ink-2)}
+p.note{font-size:14.5px;color:var(--ink-2)}
+a{color:var(--accent)}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Lieutenant Island · September 2026</div>
+  <h1>Causeway Field Card</h1>
+  <p>Ten good observations turn the road's height from a ±6-inch guess into a ±1-inch number.
+     Everything saves on this phone as you type.</p>
+</header>
+
+<div class="rules">
+  <div class="rule"><b>Write down times, not depths</b>
+    <span>The clock time water first touches pavement <em>is</em> the measurement. Near the
+      threshold the water climbs about half an inch a minute, so a time good to two minutes
+      pins the road to about an inch. Never wade in to measure.</span></div>
+  <div class="rule"><b>Only these tides count</b>
+    <span>A 12-foot tide teaches nothing — of course it flooded. These sixteen land in the band
+      we're unsure about. The teal ones are near-certain coin flips and worth five ordinary trips.</span></div>
+  <div class="rule"><b>A dry road is data</b>
+    <span>If it never wets, that's not a wasted trip — it's the observation most likely to prove
+      me wrong, which is the whole point. Log it.</span></div>
+</div>
+
+<h2 class="sec">First trip — set up once</h2>
+<div class="setup" id="setup"></div>
+
+<h2 class="sec">September tides — tap one to log it</h2>
+<div id="tides"></div>
+
+<h2 class="sec">Your log</h2>
+<p class="note">Select all and send this to me when you're back. It updates as you type.</p>
+<textarea id="log" readonly></textarea>
+<div class="btnrow">
+  <button id="sel">Select all</button>
+  <button class="ghost" id="clr">Clear everything</button>
+</div>
+
+<div class="warn"><b>Stay on dry pavement</b>
+  <p>Don't wade and don't drive through to get a closer look. A foot of moving water floats a car,
+     and salt water finishes one that stalls. Every observation on this card can be made from dry ground.</p></div>
+
+<footer>
+  <p>Times assume a typical surge. Check the crossing forecast the morning of — a windy day shifts
+     these by half an hour, and a knife-edge tide can stop being one. Expected peak is feet above
+     MLLW at Wellfleet; the road's low point is currently estimated at 10.40 ft.</p>
+</footer>
+</div>
+
+<script id="targets" type="application/json">__TARGETS__</script>
+<script>
+(function(){
+"use strict";
+var T=JSON.parse(document.getElementById("targets").textContent);
+var KEY="li-fieldcard-v1";
+var store={};
+try{ store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ store={}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} render(); }
+function P(s){var a=s.split(/[-T:]/);return new Date(a[0],a[1]-1,a[2],a[3],a[4]);}
+function ampm(hm){ if(!hm) return null; var p=hm.split(":"),h=+p[0],m=p[1],s=h<12?"am":"pm";
+  return (h%12||12)+":"+m+s; }
+
+/* ---- first-trip setup checklist ---- */
+var SETUP=[
+ ["found","Found where water actually appears first",
+  "My lidar says 735 m from the mainland end, but ten sample points sit within six inches of each other over ~150 m. There is no single low spot. Let the water show you."],
+ ["marker","Picked a permanent reference object",
+  "A specific pole, signpost, guardrail post or the bridge abutment — something still there in five years. This is the mark forever."],
+ ["photo","Took the first reference photo",
+  "Waterline against that object, from a spot you can stand on again. Same object, same angle, every visit. The phone timestamps it for you."],
+ ["where","Noted which pole it is, in writing",
+  "“third pole past the bend” beats a memory in November."]
+];
+var su=document.getElementById("setup");
+SETUP.forEach(function(s){
+  var l=document.createElement("label"); l.className="check";
+  var i=document.createElement("input"); i.type="checkbox"; i.checked=!!store["setup_"+s[0]];
+  i.addEventListener("change",function(){ store["setup_"+s[0]]=i.checked; save(); });
+  var t=document.createElement("span"); t.innerHTML=s[1]+"<small>"+s[2]+"</small>";
+  l.appendChild(i); l.appendChild(t); su.appendChild(l);
+});
+
+/* ---- tide cards ---- */
+var LAB={knife:["Knife-edge","b-knife"],wet:["Expect wet","b-wet"],dry:["Expect dry","b-dry"]};
+var host=document.getElementById("tides");
+T.forEach(function(o,ix){
+  var d=P(o.peak), id="t"+ix;
+  var rec=store[id]||(store[id]={});
+  var card=document.createElement("div"); card.className="tide";
+  var head=document.createElement("div"); head.className="thead"; head.tabIndex=0;
+  head.setAttribute("role","button");
+  var meta=document.createElement("div");
+  meta.innerHTML='<div class="tdate">'+d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+
+    '</div><div class="twhen">be there <b>'+ampm(o.arrive)+'</b> · peak '+
+    ampm(d.getHours()+":"+("0"+d.getMinutes()).slice(-2))+(o.dark?" · dark":"")+'</div>';
+  var right=document.createElement("div"); right.style.textAlign="right";
+  var badge=document.createElement("div"); badge.className="badge "+LAB[o.cat][1];
+  badge.textContent=LAB[o.cat][0];
+  var tick=document.createElement("div"); tick.className="tick";
+  right.appendChild(badge); right.appendChild(tick);
+  head.appendChild(meta); head.appendChild(right);
+  var body=document.createElement("div"); body.className="tbody";
+  body.innerHTML='<div class="detail">expected peak <b>'+o.pk.toFixed(2)+' ft</b><br>'+
+    (o.first? 'predicted under water <b>'+ampm(o.first)+'</b> to <b>'+ampm(o.last)+'</b>'
+            : 'predicted <b>not to reach the road at all</b> — the test is whether it stays dry')+'</div>';
+  function field(k,label,type){
+    var w=document.createElement("div"); w.className="field";
+    var lb=document.createElement("label"); lb.textContent=label;
+    var inp=document.createElement("input"); inp.type=type; inp.value=rec[k]||"";
+    lb.htmlFor=id+"_"+k; inp.id=id+"_"+k;
+    inp.addEventListener("input",function(){ rec[k]=inp.value; save(); });
+    w.appendChild(lb); w.appendChild(inp); body.appendChild(w);
+  }
+  field("first","Water FIRST touched pavement at","time");
+  field("last","Water LAST left pavement at","time");
+  var l=document.createElement("label"); l.className="check";
+  var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!rec.dry;
+  cb.addEventListener("change",function(){ rec.dry=cb.checked; save(); });
+  var sp=document.createElement("span"); sp.textContent="Never touched it — road stayed dry through the peak";
+  l.appendChild(cb); l.appendChild(sp); body.appendChild(l);
+  field("where","Where it appeared first (which pole / marker)","text");
+  field("notes","Anything else — wind, chop, waves washing over","text");
+  head.addEventListener("click",function(){ card.classList.toggle("open"); });
+  head.addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===" "){ e.preventDefault(); card.classList.toggle("open"); }});
+  card.appendChild(head); card.appendChild(body); host.appendChild(card);
+  card._sync=function(){
+    var got=rec.first||rec.last||rec.dry;
+    card.classList.toggle("done",!!got);
+    tick.textContent=got?"✓ logged":"";
+    head.setAttribute("aria-label",d.toDateString()+", "+LAB[o.cat][0]+(got?", logged":", not yet logged"));
+  };
+});
+
+/* ---- log ---- */
+function render(){
+  [].forEach.call(host.children,function(c){ c._sync && c._sync(); });
+  var out=["LIEUTENANT ISLAND — ROAD CALIBRATION LOG"];
+  var sd=SETUP.filter(function(s){return store["setup_"+s[0]];}).length;
+  out.push("first-trip setup: "+sd+" of "+SETUP.length+" done","");
+  var n=0;
+  T.forEach(function(o,ix){
+    var r=store["t"+ix]||{}, d=P(o.peak);
+    if(!(r.first||r.last||r.dry||r.where||r.notes)) return;
+    n++;
+    out.push(d.toDateString()+"  (expected peak "+o.pk.toFixed(2)+" ft, "+LAB[o.cat][0].toLowerCase()+")");
+    if(r.dry)   out.push("   STAYED DRY through the peak");
+    if(r.first) out.push("   first touched pavement : "+ampm(r.first));
+    if(r.last)  out.push("   last left pavement     : "+ampm(r.last));
+    if(r.where) out.push("   appeared first at      : "+r.where);
+    if(r.notes) out.push("   notes                  : "+r.notes);
+    out.push("");
+  });
+  if(!n) out.push("(no observations logged yet)");
+  else out.splice(2,0,n+" observation"+(n===1?"":"s")+" logged");
+  document.getElementById("log").value=out.join("\n");
+}
+document.getElementById("sel").addEventListener("click",function(){
+  var t=document.getElementById("log"); t.focus(); t.select(); t.setSelectionRange(0,99999);
+});
+document.getElementById("clr").addEventListener("click",function(){
+  if(!confirm("Erase every observation on this card?")) return;
+  store={}; try{ localStorage.removeItem(KEY); }catch(e){}
+  location.reload();
+});
+render();
+})();
+</script>

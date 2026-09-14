@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crossing · E · Tagged list</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.day{margin-top:14px}
+.dayhead{position:sticky;top:0;z-index:2;background:var(--ground);display:flex;justify-content:space-between;align-items:baseline;
+  padding:10px 2px 6px;border-bottom:1px solid var(--rule)}
+.dayhead b{font-family:var(--display);font-size:18px;font-weight:700}
+.dayhead span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.row{display:grid;grid-template-columns:100px 1fr auto;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--rule-2)}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);line-height:1.35}
+.tag{display:flex;gap:7px;align-items:flex-start}
+.tag .ic{margin-top:-1px;width:14px;height:14px}
+.dayhi{padding:9px 2px 10px;border-bottom:1px solid var(--rule-2)}
+.tag small{display:block;font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.05em}
+.when{font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.25}
+.dur{font-size:12.5px;color:var(--muted)}
+.row.near .when{font-size:14.5px;font-weight:500;color:var(--ink-2)}
+.row.dry .when{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0}
+.row.dry .tag{color:var(--muted)}
+.dur b{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* ---- row style variants, chosen with ?style= in the URL ---- */
+/* quiet: subtext drops to regular weight and body font, with room to breathe */
+.s-quiet .row,.s-soft .row,.s-short .row,.s-icon .row{padding:13px 2px}
+.s-quiet .dur,.s-soft .dur,.s-short .dur,.s-icon .dur{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35}
+.s-quiet .dur b,.s-soft .dur b,.s-short .dur b,.s-icon .dur b{font-family:inherit;font-weight:inherit;color:inherit}
+/* soft: the main time moves from monospace to the body face, a little lighter */
+.s-soft .when,.s-short .when,.s-icon .when{font-family:var(--body);font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.s-soft .row.near .when,.s-short .row.near .when,.s-icon .row.near .when{font-size:15px;font-weight:500}
+.s-icon .dur .ic{width:15px;height:15px;vertical-align:-3px;margin-right:5px}
+.key .ic{width:14px;height:14px}
+.none{padding:11px 2px 11px 112px;color:var(--muted);font-size:14px;border-bottom:1px solid var(--rule-2)}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">Lieutenant Island · Wellfleet</div>
+  <h1>Causeway crossing</h1>
+  <div class="statusline" id="status" hidden></div>
+  <div class="key" id="key" hidden>
+    <span><i class="dot" style="background:#fab219"></i>under 6 in</span>
+    <span><i class="dot" style="background:#ec835a"></i>6–15 in</span>
+    <span><i class="dot" style="background:#d03b3b"></i>15 in +</span>
+    <span><i class="nk"></i>close call</span>
+  </div>
+  <div class="loading" id="loading">Checking the tide…</div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <div id="days"></div>
+  <p class="fresh" id="fresh"></p>
+</main>
+<script src="tide-data.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.Tides;
+var STYLE=(location.search.match(/[?&]style=([a-z]+)/)||[])[1]||"current";
+document.body.classList.add("s-"+STYLE);
+function el(id){return document.getElementById(id);}
+/* the NOAA high tide closest to a moment, within a window either side */
+function highNear(M,t,win){
+  var best=null;
+  M.highs.forEach(function(h){var d=Math.abs(h.ms-t);if(d<=win&&(!best||d<best.d))best={d:d,h:h};});
+  return best?best.h:null;
+}
+var WAVE='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 15c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 21c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M12 3v6M9 6l3-3 3 3"/></svg>';
+function highTxt(h){
+  var t=T.fmtT(h.ms),v=h.v.toFixed(1)+" ft";
+  if(STYLE==="short")return "High "+t+" · "+v;
+  if(STYLE==="icon")return WAVE+'<span class="sr">High tide </span>'+t+" · "+v;
+  return 'High tide <b>'+t+'</b> · '+v;
+}
+function tagHTML(lbl){var p=lbl.split(" → ");return p[0]+(p[1]?"<small>→ "+p[1]+"</small>":"");}
+function render(M){
+  el("loading").hidden=true;el("err").hidden=true;el("status").hidden=false;el("key").hidden=false;
+  el("status").innerHTML=T.statusLineHTML(M);
+  if(STYLE==="icon"&&!el("key").querySelector(".hikey"))el("key").insertAdjacentHTML("beforeend",'<span class="hikey">'+WAVE+'high tide</span>');
+  var n=T.nowW(),today=T.dayStart(n),first=M.series[0].ms,html="",used={};
+  /* pair every closure and close call with the high tide that causes it */
+  M.closures.forEach(function(c){c._h=highNear(M,c.pkMs,3*T.HOUR);if(c._h)used[c._h.ms]=1;});
+  M.near.forEach(function(x){x._h=highNear(M,x.ms,2*T.HOUR);if(x._h)used[x._h.ms]=1;});
+  M.order.forEach(function(k){
+    var items=T.upcomingForDay(M,k,n),rel=k===today||k===today+T.DAY;
+    /* high tides that don't reach the road still get a quiet row, so every high tide is listed */
+    M.highs.forEach(function(h){if(T.dayStart(h.ms)===k&&h.ms>=n&&!used[h.ms])items.push({ms:h.ms,dry:h});});
+    items.sort(function(a,b){return a.ms-b.ms;});
+    html+='<section class="day"><div class="dayhead"><b>'+T.dayName(k,n)+'</b><span>'+
+      T.fmtD(k,rel?{weekday:"short",month:"short",day:"numeric"}:{month:"short",day:"numeric"})+'</span></div>';
+    if(!items.some(function(i){return i.c;})){
+      var hadEarlier=k===today&&M.closures.some(function(c){return T.dayStart(c.s)===k;});
+      html+='<div class="none">'+(hadEarlier?"No more closures today":"No closures — clear all day")+'</div>';
+    }
+    items.forEach(function(it){
+      if(it.c){
+        var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),now=c.s<=n;
+        html+='<div class="row"><div class="tag">'+T.slotIcon(T.slotIndex(M,c))+'<div>'+tagHTML(T.slotLabel(M,c))+'</div></div>'+
+          '<div><div class="when">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>'+
+          '<div class="dur">'+(now?"under water now · ":"")+(c._h?highTxt(c._h):T.fmtDur((c.e-c.s)/T.MIN))+'</div></div>'+
+          '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span></div>';
+      }else if(it.x){
+        var x=it.x;
+        html+='<div class="row near"><div class="tag">'+T.slotIcon(T.slotOf(x.ms))+'<div>'+T.SLOTS[T.slotOf(x.ms)].n+'</div></div>'+
+          '<div><div class="when">Close call</div><div class="dur">'+(x._h?highTxt(x._h):"could still wet the road")+'</div></div>'+
+          '<span class="pill nearpill">'+T.shortBy(x)+' short</span></div>';
+      }else{
+        var hd=it.dry;
+        html+='<div class="row dry"><div class="tag">'+T.slotIcon(T.slotOf(hd.ms))+'<div>'+T.SLOTS[T.slotOf(hd.ms)].n+'</div></div>'+
+          '<div><div class="when">Road stays dry</div><div class="dur">'+highTxt(hd)+'</div></div><span></span></div>';
+      }
+    });
+    html+='</section>';
+  });
+  el("days").innerHTML=html;
+  el("fresh").innerHTML=T.freshHTML(M);
+}
+T.run({render:render,
+  tick:function(M){el("status").innerHTML=T.statusLineHTML(M);},
+  error:function(err,M){
+    if(M){el("fresh").innerHTML=T.freshHTML(M,"couldn’t refresh — showing the last good data");return;}
+    el("loading").hidden=true;el("err").hidden=false;el("err").innerHTML=T.errorHTML(err);}});
+})();
+</script>
+</body>
+</html>

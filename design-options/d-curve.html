@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crossing · D · Day curve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.chips{display:flex;gap:8px;overflow-x:auto;margin:16px -16px 0;padding:2px 16px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;padding:8px 6px 9px;border-radius:12px;
+  border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip .cd{font-size:12px;color:var(--muted);font-weight:600}
+.chip .cn{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.2}
+.chip .cb{display:block;width:24px;height:4px;border-radius:2px;margin-top:4px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.chip.on .cd{color:var(--surface);opacity:.75}
+.card{margin-top:12px;background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow)}
+.chartcard{padding:12px 8px 8px}
+.chead{padding:0 8px}
+.chead b{font-family:var(--display);font-size:19px;font-weight:700}
+.readout{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);padding:4px 8px 0;min-height:40px;line-height:1.5}
+.readout b{color:var(--ink)}
+.readout .o{color:var(--shut-ink);font-weight:600}
+.readout .k{color:var(--clear-ink);font-weight:600}
+svg.chart{display:block;width:100%;height:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:crosshair}
+svg .grid{stroke:var(--rule-2);stroke-width:1}
+svg .ylab{font:10px var(--mono);fill:var(--muted);text-anchor:end}
+svg .xlab{font:10px var(--mono);fill:var(--muted);text-anchor:middle}
+svg .water{fill:var(--water-fill)}
+svg .wline{fill:none;stroke:var(--water);stroke-width:2;stroke-linejoin:round}
+svg .road{stroke:var(--shut);stroke-width:1.5;stroke-dasharray:5 4}
+svg .roadlab{font:10px var(--mono);fill:var(--shut-ink)}
+svg .clab{font:600 11px var(--mono);fill:var(--ink);text-anchor:middle}
+svg .clab2{font:10px var(--mono);fill:var(--muted);text-anchor:middle}
+svg .nearmk{fill:var(--surface);stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 2}
+svg .nowline{stroke:var(--accent);stroke-width:2}
+svg .nowlab{font:600 10px var(--mono);fill:var(--accent)}
+svg .curline{stroke:var(--ink-2);stroke-width:1}
+svg .curdot{fill:var(--water);stroke:var(--surface);stroke-width:2}
+.list{padding:2px 16px}
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--rule-2)}
+.row:last-child{border-bottom:0}
+.when{font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.dur{font-size:12.5px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:13px;font-weight:600;white-space:nowrap}
+.pill.nearpill{border:1.5px dashed var(--muted);color:var(--ink-2);font-weight:500}
+.row.past{opacity:.42}
+.none{padding:12px 0;color:var(--muted);font-size:14.5px}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">Lieutenant Island · Wellfleet</div>
+  <h1>Causeway crossing</h1>
+  <div class="statusline" id="status" hidden></div>
+  <div class="loading" id="loading">Checking the tide…</div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <div id="app" hidden>
+    <nav class="chips" id="chips" aria-label="Choose a day"></nav>
+    <div class="card chartcard">
+      <div class="chead"><b id="daytitle"></b></div>
+      <div class="readout" id="readout"></div>
+      <svg class="chart" id="chart" role="img" aria-label="Water level through the chosen day against the height of the road"></svg>
+    </div>
+    <div class="card list" id="list"></div>
+  </div>
+  <p class="fresh" id="fresh"></p>
+</main>
+<script src="tide-data.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.Tides,MODEL=null,sel=null,SV=null;
+function el(id){return document.getElementById(id);}
+function c2(ms){return T.fmtT(ms).replace("am","a").replace("pm","p");}
+function feetIn(inch){var i=Math.round(inch),f=Math.floor(i/12),r=i%12;return f?f+" ft"+(r?" "+r+" in":""):i+" in";}
+function overlapping(M,k){return M.closures.filter(function(c){return c.s<k+T.DAY&&c.e>=k;});}
+function chipsHTML(M,n){
+  return M.order.map(function(k){
+    var cl=overlapping(M,k),worst=cl.reduce(function(a,c){return Math.max(a,T.inchesOver(c));},0),
+        nm=M.near.some(function(x){return T.dayStart(x.ms)===k;});
+    var bar=worst>0?"background:"+T.stateFor(worst).color:(nm?"height:0;border-top:2px dashed var(--muted)":"background:var(--rule)");
+    return '<button type="button" class="chip'+(k===sel?" on":"")+'" data-k="'+k+'" aria-pressed="'+(k===sel)+'">'+
+      '<span class="cd">'+(k===T.dayStart(n)?"Today":T.fmtD(k,{weekday:"short"}))+'</span>'+
+      '<span class="cn">'+T.fmtD(k,{day:"numeric"})+'</span><i class="cb" style="'+bar+'"></i></button>';
+  }).join("");
+}
+function daySummary(M,k){
+  var cl=overlapping(M,k),nm=M.near.filter(function(x){return T.dayStart(x.ms)===k;});
+  var s=cl.length?cl.length+(cl.length===1?" closure":" closures"):"No closures";
+  if(nm.length)s+=" · "+nm.length+(nm.length===1?" close call":" close calls");
+  return s+" — drag across the chart to check any time";
+}
+function drawChart(M){
+  var k=sel,t0=k,t1=k+T.DAY,n=T.nowW(),svg=el("chart");
+  var pts=M.series.filter(function(p){return p.ms>=t0&&p.ms<=t1;});
+  if(pts.length<2)return;
+  var W=360,H=236,m={l:26,r:8,t:38,b:22};
+  var lv=pts.map(function(p){return p.lvl;});
+  var lo=Math.floor(Math.min.apply(null,lv))-0.5,hi=Math.max(T.ROAD+1,Math.ceil(Math.max.apply(null,lv)+0.3));
+  function x(ms){return m.l+(ms-t0)/(t1-t0)*(W-m.l-m.r);}
+  function y(v){return m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b);}
+  var s="";
+  for(var g=Math.ceil(lo/2)*2;g<=hi;g+=2)
+    s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y(g).toFixed(1)+'" y2="'+y(g).toFixed(1)+'" class="grid"/>'+
+       '<text x="'+(m.l-5)+'" y="'+(y(g)+3.5).toFixed(1)+'" class="ylab">'+g+'</text>';
+  ["12a","3a","6a","9a","noon","3p","6p","9p","12a"].forEach(function(l,i){
+    var tx=x(t0+i*3*T.HOUR);
+    s+='<text x="'+tx.toFixed(1)+'" y="'+(H-6)+'" class="xlab" style="text-anchor:'+(i===0?"start":i===8?"end":"middle")+'">'+l+'</text>';
+  });
+  var area="M"+x(pts[0].ms).toFixed(1)+" "+y(lo).toFixed(1),line="";
+  pts.forEach(function(p,i){var px=x(p.ms).toFixed(1),py=y(p.lvl).toFixed(1);area+=" L"+px+" "+py;line+=(i?" L":"M")+px+" "+py;});
+  area+=" L"+x(pts[pts.length-1].ms).toFixed(1)+" "+y(lo).toFixed(1)+" Z";
+  s+='<path d="'+area+'" class="water"/>';
+  var run=[];
+  function flush(){
+    if(run.length>1){
+      var d="M"+x(run[0].ms).toFixed(1)+" "+y(T.ROAD).toFixed(1);
+      run.forEach(function(p){d+=" L"+x(p.ms).toFixed(1)+" "+y(p.lvl).toFixed(1);});
+      d+=" L"+x(run[run.length-1].ms).toFixed(1)+" "+y(T.ROAD).toFixed(1)+" Z";
+      var pk=run.reduce(function(a,p){return p.lvl>a.lvl?p:a;});
+      s+='<path d="'+d+'" fill="'+T.stateFor(pk.inch).color+'" opacity=".6"/>';
+    }
+    run=[];
+  }
+  pts.forEach(function(p){if(p.lvl>T.ROAD)run.push(p);else flush();});flush();
+  s+='<path d="'+line+'" class="wline"/>';
+  s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y(T.ROAD).toFixed(1)+'" y2="'+y(T.ROAD).toFixed(1)+'" class="road"/>';
+  s+='<text x="'+(m.l+3)+'" y="'+(y(T.ROAD)-4).toFixed(1)+'" class="roadlab">road</text>';
+  overlapping(M,k).forEach(function(c){
+    var cx=(x(Math.max(c.s,t0))+x(Math.min(c.e,t1)))/2;cx=Math.max(m.l+42,Math.min(W-m.r-42,cx));
+    s+='<text x="'+cx.toFixed(1)+'" y="13" class="clab">'+(c.s<=t0?"until "+c2(c.e):c2(c.s)+"–"+c2(c.e))+'</text>'+
+       '<text x="'+cx.toFixed(1)+'" y="26" class="clab2">up to '+T.depthTxt(T.inchesOver(c))+'</text>';
+  });
+  M.near.filter(function(x0){return T.dayStart(x0.ms)===k;}).forEach(function(nm){
+    var cx=Math.max(m.l+42,Math.min(W-m.r-42,x(nm.ms)));
+    s+='<circle cx="'+x(nm.ms).toFixed(1)+'" cy="'+y(nm.lvl).toFixed(1)+'" r="4" class="nearmk"/>'+
+       '<text x="'+cx.toFixed(1)+'" y="13" class="clab2">close call '+c2(nm.ms)+'</text>'+
+       '<text x="'+cx.toFixed(1)+'" y="26" class="clab2">'+T.shortBy(nm)+' short</text>';
+  });
+  if(n>=t0&&n<t1)s+='<line x1="'+x(n).toFixed(1)+'" x2="'+x(n).toFixed(1)+'" y1="'+m.t+'" y2="'+(H-m.b)+'" class="nowline"/>'+
+     '<text x="'+(x(n)+4).toFixed(1)+'" y="'+(H-m.b-4)+'" class="nowlab">now</text>';
+  s+='<g id="cur" style="display:none"><line y1="'+m.t+'" y2="'+(H-m.b)+'" class="curline"/><circle r="4.5" class="curdot"/></g>';
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);svg.innerHTML=s;
+  SV={pts:pts,x:x,y:y,W:W};
+  el("readout").textContent=daySummary(M,k);
+}
+function scrub(ev){
+  if(!SV)return;
+  var svg=el("chart"),r=svg.getBoundingClientRect(),vx=(ev.clientX-r.left)/r.width*SV.W,best=null;
+  SV.pts.forEach(function(p){var d=Math.abs(SV.x(p.ms)-vx);if(!best||d<best.d)best={d:d,p:p};});
+  var p=best.p,g=svg.querySelector("#cur"),ln=g.querySelector("line"),c=g.querySelector("circle");
+  g.style.display="";ln.setAttribute("x1",SV.x(p.ms));ln.setAttribute("x2",SV.x(p.ms));
+  c.setAttribute("cx",SV.x(p.ms));c.setAttribute("cy",SV.y(p.lvl));
+  var clo=T.closureAt(MODEL,p.ms);
+  el("readout").innerHTML='<b>'+T.fmtD(p.ms,{weekday:"short"})+" "+T.fmtT(p.ms)+'</b> — '+(p.inch>0
+    ?'<span class="o">under water, '+Math.round(p.inch)+' in over the road</span>'+(clo?"<br>reopens "+T.fmtT(clo.e):"")
+    :'<span class="k">clear</span>, '+feetIn(-p.inch)+' below the road');
+}
+el("chart").addEventListener("pointerdown",scrub);
+el("chart").addEventListener("pointermove",scrub);
+el("chart").addEventListener("pointerleave",function(e){
+  if(e.pointerType!=="mouse"||!MODEL)return;var g=el("chart").querySelector("#cur");if(g)g.style.display="none";
+  el("readout").textContent=daySummary(MODEL,sel);});
+function listHTML(M){
+  var k=sel,n=T.nowW(),first=M.series[0].ms,items=[];
+  overlapping(M,k).forEach(function(c){items.push({ms:c.s,c:c});});
+  M.near.forEach(function(x){if(T.dayStart(x.ms)===k)items.push({ms:x.ms,x:x});});
+  items.sort(function(a,b){return a.ms-b.ms;});
+  if(!items.length)return '<div class="none">No water on the road all day.</div>';
+  return items.map(function(it){
+    if(it.c){
+      var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),cont=c.s<=k;
+      return '<div class="row'+(c.e<n?" past":"")+'"><div><div class="when">'+(cont||c.s===first?"until ":T.fmtT(c.s)+" – ")+T.fmtT(c.e)+'</div>'+
+        '<div class="dur">'+(cont?"continues from the night before":T.partOfDay(c.s))+" · "+T.fmtDur((c.e-c.s)/T.MIN)+'</div></div>'+
+        '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span></div>';
+    }
+    return '<div class="row'+(it.x.ms<n?" past":"")+'"><div><div class="when" style="font-weight:500;font-size:15px">'+T.fmtT(it.x.ms)+' high tide</div>'+
+      '<div class="dur">Close call — could still wet the road</div></div><span class="pill nearpill">'+T.shortBy(it.x)+' short</span></div>';
+  }).join("");
+}
+function drawDay(M){
+  var n=T.nowW();
+  el("chips").innerHTML=chipsHTML(M,n);
+  el("daytitle").textContent=T.dayName(sel,n)+", "+T.fmtD(sel,{month:"long",day:"numeric"});
+  drawChart(M);
+  el("list").innerHTML=listHTML(M);
+}
+function render(M){
+  MODEL=M;
+  el("loading").hidden=true;el("err").hidden=true;el("status").hidden=false;el("app").hidden=false;
+  var n=T.nowW();
+  if(sel==null||!M.days[sel])sel=M.days[T.dayStart(n)]?T.dayStart(n):M.order[0];
+  el("status").innerHTML=T.statusLineHTML(M);
+  drawDay(M);
+  el("fresh").innerHTML=T.freshHTML(M);
+}
+el("chips").addEventListener("click",function(e){
+  var b=e.target.closest(".chip");if(!b||!MODEL)return;sel=+b.getAttribute("data-k");drawDay(MODEL);
+});
+T.run({render:render,
+  tick:function(M){el("status").innerHTML=T.statusLineHTML(M);},
+  error:function(err,M){
+    if(M){el("fresh").innerHTML=T.freshHTML(M,"couldn’t refresh — showing the last good data");return;}
+    el("loading").hidden=true;el("err").hidden=false;el("err").innerHTML=T.errorHTML(err);}});
+})();
+</script>
+</body>
+</html>

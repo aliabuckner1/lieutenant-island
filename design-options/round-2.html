@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Causeway Crossing Round Two</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.wrap{max-width:2200px;margin:0 auto;padding:30px 24px 60px}
+.wrap h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:78ch;margin:8px 0 0;font-size:15px}
+.lede a{color:var(--accent)}
+.grid{display:flex;flex-wrap:wrap;gap:32px;margin-top:26px}
+figure{margin:0;width:390px}
+figcaption{margin-bottom:12px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 6px;font-size:13.5px;color:var(--ink-2);min-height:62px}
+figcaption a{font-size:13px;color:var(--accent);font-weight:600}
+iframe{display:block;width:390px;height:844px;border:1px solid var(--rule);border-radius:30px;background:var(--ground);box-shadow:var(--shadow)}
+figure.ref iframe{opacity:.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options · round two</div>
+  <h1>A's readability, B's skimming</h1>
+  <p class="lede">Four takes on keeping A's full, readable times while making it easy to skim for morning, afternoon or evening — the thing you liked about B.
+    Parts of the day mean the same everywhere: overnight 12–6am, morning 6am–noon, afternoon noon–6pm, evening 6pm–12am. Past closures drop off.
+    Each part of the day has a line icon (moon, sunrise, sun, sunset), and every day ends with a quiet line of NOAA's high-tide times and heights for boating. Add <code>?icons=off</code> to any page to compare without icons. A is on the left for reference. <a href="index.html">Round one →</a></p>
+  <div class="grid">
+    <figure class="ref"><figcaption><div class="id">Reference · A</div><b>Tide table</b>
+      <p>Where we started: closures by day with time, part of day and depth.</p>
+      <a href="a-table.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="a-table.html" title="Option A: tide table"></iframe></figure>
+    <figure><figcaption><div class="id">Option E</div><b>Tagged list</b>
+      <p>A, with a left column naming the part of the day. Each row's subtext is the high tide behind it; high tides that stay off the road get a quiet row.</p>
+      <a href="e-tagged.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html" title="Option E: tagged list"></iframe></figure>
+    <figure><figcaption><div class="id">Option F</div><b>Day cards with a strip</b>
+      <p>Each day opens with a slim overnight · morning · afternoon · evening strip, tinted where there's water, then full rows.</p>
+      <a href="f-strip.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="f-strip.html" title="Option F: day cards with a strip"></iframe></figure>
+    <figure><figcaption><div class="id">Option G</div><b>Four slots every day</b>
+      <p>Every day shows the same four lines in the same order, so your eye lands in the same place each day. Clear slots stay faint.</p>
+      <a href="g-slots.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="g-slots.html" title="Option G: four slots every day"></iframe></figure>
+    <figure><figcaption><div class="id">Option H</div><b>Tap to expand</b>
+      <p>One line per day with part-of-day chips, so the week fits on one screen. Tap a day for full times. Today and tomorrow start open.</p>
+      <a href="h-accordion.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="h-accordion.html" title="Option H: tap to expand"></iframe></figure>
+  </div>
+</div>
+</body>
+</html>

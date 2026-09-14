@@ -1,0 +1,604 @@
+<title>Lieutenant Island Crossing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E9EFF1; --surface:#FBFCFC; --surface-2:#F2F6F7;
+  --ink:#0F2027; --ink-2:#33505B; --muted:#63808B; --rule:#D2DDE0; --rule-2:#E2EAEC;
+  --accent:#0B6E7A; --accent-soft:#0b6e7a1a; --water:#3E8FA6; --water-fill:#3e8fa626;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --good-bg:#0ca30c1f; --warning-bg:#fab2192e; --serious-bg:#ec835a2e; --critical-bg:#d03b3b26;
+  --shadow:0 1px 2px #0f202710, 0 8px 24px #0f20270d;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --body:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --display:"Bitter",Georgia,"Times New Roman",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0C171B; --surface:#132329; --surface-2:#182D34;
+  --ink:#E8EFF1; --ink-2:#B4C7CD; --muted:#8AA3AC; --rule:#26404A; --rule-2:#1E353D;
+  --accent:#4FB3C0; --accent-soft:#4fb3c022; --water:#5AA8BF; --water-fill:#5aa8bf2b;
+  --good-bg:#0ca30c2b; --warning-bg:#fab2192b; --serious-bg:#ec835a2b; --critical-bg:#d03b3b2b;
+  --shadow:0 1px 2px #0006, 0 10px 28px #0000004d;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#0C171B; --surface:#132329; --surface-2:#182D34;
+  --ink:#E8EFF1; --ink-2:#B4C7CD; --muted:#8AA3AC; --rule:#26404A; --rule-2:#1E353D;
+  --accent:#4FB3C0; --accent-soft:#4fb3c022; --water:#5AA8BF; --water-fill:#5aa8bf2b;
+  --good-bg:#0ca30c2b; --warning-bg:#fab2192b; --serious-bg:#ec835a2b; --critical-bg:#d03b3b2b;
+  --shadow:0 1px 2px #0006, 0 10px 28px #0000004d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 72px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+a{color:var(--accent)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:500}
+
+/* ---------- masthead ---------- */
+header.top{padding:38px 0 22px;border-bottom:1px solid var(--rule)}
+header.top h1{font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+header.top p.sub{margin:10px 0 0;color:var(--ink-2);max-width:62ch;font-size:15.5px}
+.updated{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.updated b{color:var(--ink-2);font-weight:500}
+
+/* ---------- hero status ---------- */
+.status{margin-top:26px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden}
+.status .bar{height:5px}
+.status .inner{padding:26px 26px 24px;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:start}
+@media(max-width:640px){.status .inner{grid-template-columns:1fr}}
+.state-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dot{width:13px;height:13px;border-radius:50%;flex:none}
+.state-word{font-family:var(--display);font-size:clamp(26px,4.4vw,36px);font-weight:700;letter-spacing:-.015em;line-height:1}
+.state-sub{margin:12px 0 0;font-size:16px;color:var(--ink-2);max-width:46ch}
+.state-sub strong{color:var(--ink);font-weight:600}
+.countdown{text-align:right}
+@media(max-width:640px){.countdown{text-align:left}}
+.countdown .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.countdown .v{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.countdown .w{font-size:13px;color:var(--muted)}
+
+/* ---------- generic section ---------- */
+section{margin-top:44px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;
+  padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.sechead h2{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.sechead .note{font-size:13px;color:var(--muted);max-width:52ch}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;
+  box-shadow:var(--shadow)}
+
+/* ---------- legend ---------- */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0 4px;align-items:center}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+.lg i{width:14px;height:14px;border-radius:4px;display:block;flex:none;border:1px solid #0002}
+
+/* ---------- day ribbons ---------- */
+.ribwrap{position:relative;margin-top:18px}
+.ribbons{overflow-x:auto}
+.rgrid{min-width:430px}
+.rrow{display:grid;grid-template-columns:var(--labw,104px) 1fr;align-items:center;gap:12px;padding:3px 0}
+.rlab{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right;white-space:nowrap}
+.rlab b{color:var(--ink);font-weight:600}
+.rlab.today b{color:var(--accent)}
+.rtrack{position:relative;height:26px;background:var(--surface-2);border:1px solid var(--rule-2);
+  border-radius:5px;overflow:hidden}
+.rband{position:absolute;top:0;bottom:0;border-radius:2px}
+.rband{box-shadow:0 0 0 1px #0000000f;cursor:crosshair}
+.rband:hover{box-shadow:inset 0 0 0 2px var(--ink),0 0 0 1px #0000000f}
+.rnow{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--accent);border-radius:2px;z-index:3}
+.rnow::after{content:"";position:absolute;top:-3px;left:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--accent)}
+.raxis{display:grid;grid-template-columns:var(--labw,104px) 1fr;gap:12px;margin-top:7px}
+.rticks{position:relative;height:14px}
+.rticks span{position:absolute;transform:translateX(-50%);font-family:var(--mono);font-size:10.5px;
+  color:var(--muted);white-space:nowrap;top:0}
+.rticks span:first-child{transform:none}
+.rticks span:last-child{transform:translateX(-100%)}
+@media(max-width:560px){.rgrid,.raxis{--labw:74px}.rlab{font-size:11px}
+  .rticks span{font-size:9.5px}}
+.rband:focus-visible,.dayrow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- chart ---------- */
+.chartwrap{margin-top:16px;position:relative}
+svg.chart{display:block;width:100%;height:auto;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--rule);
+  border-radius:9px;padding:9px 12px;font-family:var(--mono);font-size:12px;box-shadow:var(--shadow);
+  opacity:0;transition:opacity .12s;z-index:5;min-width:140px}
+.tip .t{color:var(--muted);font-size:11px}
+.tip .l{font-size:15px;font-weight:600;margin-top:3px}
+.tip .d{margin-top:3px}
+.tip .cur{margin-top:7px;padding-top:7px;border-top:1px solid var(--rule-2);color:var(--ink-2);
+  display:flex;align-items:center;gap:6px}
+.tip .cur i{width:8px;height:8px;border-radius:50%;flex:none}
+#rtip{min-width:186px;max-width:min(264px,86vw);line-height:1.45}
+#rtip .l{white-space:nowrap}
+#rtip .d{font-size:11.5px;color:var(--muted)}
+
+/* ---------- table ---------- */
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:6px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule-2)}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;border-bottom:1px solid var(--rule)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:99px;
+  font-size:11.5px;font-weight:600;white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;flex:none}
+details.tbl{margin-top:16px}
+details.tbl summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:500;
+  padding:6px 0;list-style:none;display:flex;align-items:center;gap:7px}
+details.tbl summary::-webkit-details-marker{display:none}
+details.tbl summary::before{content:"▸";transition:transform .15s;display:inline-block}
+details.tbl[open] summary::before{transform:rotate(90deg)}
+
+/* ---------- prose ---------- */
+.prose{max-width:66ch}
+.prose p{color:var(--ink-2);margin:14px 0}
+.prose h3{font-size:16px;font-weight:600;margin:26px 0 6px;color:var(--ink)}
+.prose strong{color:var(--ink);font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin-top:18px}
+.fact{background:var(--surface);padding:16px 18px}
+.fact .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-family:var(--mono);font-size:25px;font-weight:600;letter-spacing:-.02em;margin-top:5px;line-height:1.1}
+.fact .w{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.4}
+.caution{margin-top:20px;background:var(--warning-bg);border:1px solid #fab21966;border-radius:12px;padding:18px 20px}
+.caution h3{font-family:var(--display);font-size:15.5px;font-weight:700;margin:0 0 7px}
+.caution p{margin:0;font-size:14px;color:var(--ink-2);max-width:64ch}
+footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
+footer p{margin:7px 0;max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Wellfleet · Cape Cod · NOAA 8446613</div>
+  <h1>Lieutenant Island Crossing</h1>
+  <p class="sub">When the marsh road is under water — built from NOAA tide predictions, live Boston
+     water levels, forecast wind and barometric pressure, and a lidar survey of the road itself.</p>
+  <div class="updated">Forecast built <b id="built"></b> · road low point <b id="roadft"></b> ft above MLLW</div>
+</header>
+
+<div class="status" id="status">
+  <div class="bar" id="statusbar"></div>
+  <div class="inner">
+    <div>
+      <div class="state-line"><span class="dot" id="statusdot"></span><span class="state-word" id="statusword"></span></div>
+      <p class="state-sub" id="statussub"></p>
+    </div>
+    <div class="countdown"><div class="k" id="cdk"></div><div class="v" id="cdv"></div><div class="w" id="cdw"></div></div>
+  </div>
+</div>
+
+<section>
+  <div class="sechead">
+    <h2>The next eight days</h2>
+    <div class="note">Each row is one day, midnight to midnight. Closures march about 50 minutes later
+      each day — that diagonal is the lunar cycle.</div>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="ribwrap">
+    <div class="ribbons"><div class="rgrid" id="rgrid">
+        <div class="raxis"><div></div><div class="rticks" id="rticks"></div></div>
+    </div></div>
+    <div class="tip" id="rtip" role="status" aria-live="off"></div>
+  </div>
+  <details class="tbl"><summary>Show as a table</summary><div style="overflow-x:auto"><table id="closetbl">
+    <thead><tr><th>Day</th><th>Under water</th><th>For</th><th>Deepest</th><th>State</th></tr></thead>
+    <tbody></tbody></table></div></details>
+</section>
+
+<section>
+  <div class="sechead">
+    <h2>Water level against the road</h2>
+    <div class="note">Tap a day above to change the window. The shaded band is how uncertain the
+      road's true height is until we measure it on the ground.</div>
+  </div>
+  <div class="card chartwrap">
+    <svg class="chart" id="lvl" viewBox="0 0 900 320" role="img"
+         aria-label="Predicted water level against the road elevation"></svg>
+    <div class="tip" id="tip"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <h2>The road, surveyed</h2>
+    <div class="note">USGS 3DEP lidar sampled every 8 metres along the causeway, converted from NAVD88
+      to tide-chart feet with NOAA VDatum.</div>
+  </div>
+  <div class="card"><svg class="chart" id="prof" viewBox="0 0 900 250" role="img"
+       aria-label="Elevation profile of Lieutenant Island Road with today's peak water level"></svg></div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Why “9.5 feet” stopped working</h2></div>
+  <div class="facts">
+    <div class="fact"><div class="k">Predictions run low</div><div class="v" id="f1">+0.45 ft</div>
+      <div class="w">Average gap between predicted and actual high water, 7,596 tides since 2005</div></div>
+    <div class="fact"><div class="k">Higher than predicted</div><div class="v">87%</div>
+      <div class="w">Share of high tides that come in above the chart. It is a bias, not noise</div></div>
+    <div class="fact"><div class="k">Sea level since the datum</div><div class="v">+6.5 in</div>
+      <div class="w">The charts are pinned to a 1983–2001 average. The ocean moved; the chart didn't</div></div>
+    <div class="fact"><div class="k">Northeast gale, 25 kt</div><div class="v">+0.9 ft</div>
+      <div class="w">Wind alone. A southwest wind of the same strength takes the same amount away</div></div>
+  </div>
+  <div class="prose">
+    <h3>Nothing is actually measured at Wellfleet</h3>
+    <p>NOAA station 8446613 is a <strong>subordinate</strong> station: no gauge, no sensor, and there never
+      has been one. Every Wellfleet tide chart in every app is the <strong>Boston</strong> prediction
+      multiplied by 1.05 and shifted fourteen minutes. You have been navigating by a number computed
+      sixty miles away, and it only ever described the astronomy — never the weather.</p>
+    <h3>The moon was never the problem</h3>
+    <p>Lunar phase and perigee are already inside the prediction. Spring tides are not the surprise.
+      What the chart cannot see is <strong>barometric pressure</strong> (−0.32 ft per 10 mb, almost exactly
+      the textbook inverse barometer) and <strong>wind</strong>. Together with the sea-level trend those
+      explain 58% of the error and cut the uncertainty from ±0.48 ft to ±0.31 ft.</p>
+    <h3>So your rule of thumb was right — on an average day</h3>
+    <p>A predicted 9.5 ft plus a typical surge lands almost exactly on the road's low point. That is why
+      it worked for years. But the surge ranges from −0.6 ft to +2.0 ft, so the predicted height that
+      actually floods the road swings between roughly <strong>8.4 ft in a northeaster</strong> and
+      <strong>10.7 ft under a cold, dry, offshore high</strong>. One number could never cover that.</p>
+  </div>
+  <div class="caution">
+    <h3>Read this before you trust the depths</h3>
+    <p>The <em>timing</em> here is solid. The <em>depths</em> are not yet — the road's height comes from
+      airborne lidar, good to about ±6 inches, and has never been checked against the actual water.
+      Until it is, treat the first amber band as already closed and give yourself the margin. Water over
+      a road is deeper and faster than it looks, and salt water ends cars.</p>
+  </div>
+</section>
+
+<footer>
+  <p><b>Sources.</b> Tide predictions: NOAA CO-OPS stations 8446613 (Wellfleet) and 8443970 (Boston).
+     Live water level and barometric pressure: Boston 8443970. Wind history: NDBC buoy 44013, Massachusetts Bay.
+     Wind forecast: NWS gridpoint BOX. Pressure forecast: Open-Meteo. Road elevation: USGS 3DEP lidar via
+     The National Map. Vertical datum: NOAA VDatum (NAVD88 → MLLW = 6.14 ft at this location, ±0.39).</p>
+  <p><b>Method.</b> The continuous Wellfleet curve is Boston's 6-minute prediction time-warped onto NOAA's
+     official Wellfleet high and low waters — it reproduces them to within 0.002 ft. Surge is a least-squares
+     fit of observed-minus-predicted high water on pressure, wind vector and year (n=3,258, R²=0.58), blended
+     with the live Boston residual for the first eighteen hours.</p>
+  <p>This is a neighbourly estimate, not a navigation aid. Nobody is liable for your muffler.</p>
+</footer>
+</div>
+
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script id="profile" type="application/json">__PROFILE__</script>
+<script>
+(function(){
+"use strict";
+var D=JSON.parse(document.getElementById("payload").textContent);
+var PROF=JSON.parse(document.getElementById("profile").textContent);
+var ROAD=D.road_ft_mllw, UNC=D.road_uncert_ft;
+var TZ="America/New_York";
+var STATES=[
+ {key:"clear", word:"Road is clear",  color:"#0ca30c", bg:"var(--good-bg)",    lab:"Clear"},
+ {key:"wet",   word:"First water",    color:"#fab219", bg:"var(--warning-bg)", lab:"Shallow · under 6 in"},
+ {key:"deep",  word:"Under water",    color:"#ec835a", bg:"var(--serious-bg)", lab:"Deep · 6–15 in"},
+ {key:"shut",  word:"Do not cross",   color:"#d03b3b", bg:"var(--critical-bg)",lab:"Impassable · 15 in +"}
+];
+function stateFor(inches){ if(inches<=0)return STATES[0]; if(inches<=6)return STATES[1];
+  if(inches<=15)return STATES[2]; return STATES[3]; }
+function P(s){var a=s.split(/[-T:]/);return new Date(a[0],a[1]-1,a[2],a[3],a[4]);}
+function nowET(){
+  var p=new Intl.DateTimeFormat("en-US",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).formatToParts(new Date()),o={};
+  p.forEach(function(x){o[x.type]=x.value});
+  return new Date(+o.year,+o.month-1,+o.day,+(o.hour==="24"?"0":o.hour),+o.minute,+o.second);
+}
+var series=D.series.map(function(p){var d=P(p.t);
+  return {d:d,ms:d.getTime(),lvl:p.lvl,astro:p.astro,surge:p.surge,inch:(p.lvl-ROAD)*12};});
+var fmtT=function(d){var h=d.getHours(),m=d.getMinutes(),ap=h<12?"am":"pm";h=h%12||12;
+  return h+":"+(m<10?"0":"")+m+ap;};
+var fmtDur=function(mins){var h=Math.floor(mins/60),m=Math.round(mins%60);
+  return ((h?h+"h ":"")+(m||!h?m+"m":"")).trim();};
+
+/* ---- header ---- */
+document.getElementById("built").textContent=P(D.generated).toLocaleString("en-US",
+  {weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+document.getElementById("roadft").textContent=ROAD.toFixed(1);
+
+/* ---- hero status ---- */
+function interp(ms){
+  if(ms<=series[0].ms)return series[0]; if(ms>=series[series.length-1].ms)return series[series.length-1];
+  var lo=0,hi=series.length-1;
+  while(hi-lo>1){var mid=(lo+hi)>>1; if(series[mid].ms<=ms)lo=mid;else hi=mid;}
+  var a=series[lo],b=series[hi],w=(ms-a.ms)/(b.ms-a.ms);
+  return {lvl:a.lvl+w*(b.lvl-a.lvl),inch:a.inch+w*(b.inch-a.inch),surge:a.surge};
+}
+function renderStatus(){
+  var n=nowET(),cur=interp(n.getTime()),st=stateFor(cur.inch);
+  document.getElementById("statusbar").style.background=st.color;
+  document.getElementById("statusdot").style.background=st.color;
+  document.getElementById("statusword").textContent=st.word;
+  document.getElementById("status").style.background=st.bg;
+  var sub=document.getElementById("statussub");
+  if(cur.inch<=0){
+    sub.innerHTML="Water is <strong>"+Math.abs(Math.round(cur.inch))+" inches below</strong> the low point of the causeway.";
+  }else{
+    sub.innerHTML="About <strong>"+Math.round(cur.inch)+" inches</strong> of water over the low point of the causeway.";
+  }
+  /* next transition */
+  var wet=cur.inch>0, target=null;
+  for(var i=0;i<series.length;i++){
+    if(series[i].ms<=n.getTime())continue;
+    if((series[i].inch>0)!==wet){target=series[i];break;}
+  }
+  var k=document.getElementById("cdk"),v=document.getElementById("cdv"),w=document.getElementById("cdw");
+  if(target){
+    var mins=(target.ms-n.getTime())/60000;
+    k.textContent=wet?"Reopens in":"Closes in";
+    v.textContent=fmtDur(mins);
+    w.textContent="around "+fmtT(target.d)+(target.d.getDate()!==n.getDate()?" tomorrow":"");
+  }else{k.textContent="";v.textContent="";w.textContent="";}
+}
+renderStatus(); setInterval(renderStatus,30000);
+
+/* ---- legend ---- */
+var lg=document.getElementById("legend");
+STATES.forEach(function(s){var e=document.createElement("div");e.className="lg";
+  e.innerHTML='<i style="background:'+s.color+'"></i>'+s.lab; lg.appendChild(e);});
+
+/* ---- day ribbons ---- */
+var days={},order=[];
+series.forEach(function(p){var k=p.d.getFullYear()+"-"+p.d.getMonth()+"-"+p.d.getDate();
+  if(!days[k]){days[k]=[];order.push(k);} days[k].push(p);});
+var rtip=document.getElementById("rtip");
+function atMin(day,m){
+  return fmtT(new Date(day.getFullYear(),day.getMonth(),day.getDate(),Math.floor(m/60),Math.round(m%60)));
+}
+function hideBandTip(){ rtip.style.opacity=0; }
+function depthTxt(i){ return i<1?"under 1 in":Math.round(i)+" in"; }
+function showBandTip(ev,b){
+  var r=b._run,day=b._day,pts=b._pts;
+  var wrap=document.querySelector(".ribwrap"),wr=wrap.getBoundingClientRect();
+  var trk=b.parentNode,tk=trk.getBoundingClientRect();
+  var cx=ev.touches?ev.touches[0].clientX:ev.clientX;
+  var mins=Math.max(r.s,Math.min(r.e,(cx-tk.left)/tk.width*1440));
+  var best=null;
+  pts.forEach(function(p){
+    var m=p.d.getHours()*60+p.d.getMinutes(),dd=Math.abs(m-mins);
+    if(!best||dd<best.dd)best={dd:dd,p:p,m:m};
+  });
+  var st=stateFor(best.p.inch);
+  rtip.innerHTML='<div class="t">'+
+      day.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+'</div>'+
+    '<div class="l">'+atMin(day,r.s)+" – "+atMin(day,r.e)+'</div>'+
+    '<div class="d">'+fmtDur(r.e-r.s)+" under water · deepest "+depthTxt(r.pk)+'</div>'+
+    '<div class="cur"><i style="background:'+st.color+'"></i>'+atMin(day,best.m)+" · "+
+      (best.p.inch<1?"just at the edge":Math.round(best.p.inch)+" in over road")+'</div>';
+  rtip.style.opacity=1;
+  var tw=rtip.offsetWidth,th=rtip.offsetHeight;
+  var left=Math.max(4,Math.min(cx-wr.left-tw/2,wr.width-tw-4));
+  var top=tk.top-wr.top-th-9;
+  if(top<2)top=tk.bottom-wr.top+9;
+  rtip.style.left=left+"px"; rtip.style.top=top+"px";
+}
+document.addEventListener("touchstart",function(e){
+  if(!e.target.classList||!e.target.classList.contains("rband"))hideBandTip();
+},{passive:true});
+var nowD=nowET();
+var grid=document.getElementById("rgrid"),selected=order[0];
+order.forEach(function(k,idx){
+  var pts=days[k],d0=pts[0].d;
+  var row=document.createElement("div");row.className="dayrow rrow";row.tabIndex=0;
+  row.setAttribute("role","button");
+  var isToday=d0.toDateString()===nowD.toDateString();
+  var lab=document.createElement("div");lab.className="rlab"+(isToday?" today":"");
+  lab.innerHTML="<b>"+(isToday?"Today":d0.toLocaleDateString("en-US",{weekday:"short"}))+"</b> "+
+    d0.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  var tr=document.createElement("div");tr.className="rtrack";tr._bands=[];
+  function trackHit(e){
+    var cx=e.touches?e.touches[0].clientX:e.clientX,hit=null;
+    tr._bands.forEach(function(b){
+      var r=b.getBoundingClientRect();
+      var d=Math.max(r.left-cx,cx-r.right,0);
+      if(d<=8&&(!hit||d<hit.d))hit={d:d,b:b};
+    });
+    if(hit)showBandTip(e,hit.b); else hideBandTip();
+  }
+  tr.addEventListener("mousemove",trackHit);
+  tr.addEventListener("mouseleave",hideBandTip);
+  tr.addEventListener("touchstart",trackHit,{passive:true});
+  tr.addEventListener("touchmove",trackHit,{passive:true});
+  /* one band per contiguous closure; colour gradient shows it deepening then easing */
+  var run=null,runs=[];
+  pts.forEach(function(p){
+    var mins=p.d.getHours()*60+p.d.getMinutes();
+    if(p.inch<=0){ if(run){runs.push(run);run=null;} return; }
+    if(!run) run={s:mins,e:mins,pk:p.inch,stops:[]};
+    run.e=mins; run.pk=Math.max(run.pk,p.inch);
+    run.stops.push({m:mins,c:stateFor(p.inch).color});
+  });
+  if(run)runs.push(run);
+  runs.forEach(function(r){
+    var b=document.createElement("div");b.className="rband";
+    var span=Math.max(r.e-r.s,6);
+    b.style.left=(r.s/1440*100)+"%";
+    b.style.width=Math.max(span/1440*100,0.5)+"%";
+    var g=r.stops.map(function(s){return s.c+" "+(((s.m-r.s)/span)*100).toFixed(1)+"%";});
+    b.style.background=r.stops.length>1?"linear-gradient(90deg,"+g.join(",")+")":r.stops[0].c;
+    b._run=r; b._day=d0; b._pts=pts;
+    b.setAttribute("aria-label",
+      atMin(d0,r.s)+" to "+atMin(d0,r.e)+", up to "+Math.round(r.pk)+" inches over the road");
+    tr._bands.push(b);
+    tr.appendChild(b);
+  });
+  if(isToday){var nl=document.createElement("div");nl.className="rnow";
+    nl.style.left=((nowD.getHours()*60+nowD.getMinutes())/1440*100)+"%";
+    nl.title="Now"; tr.appendChild(nl);}
+  row.appendChild(lab);row.appendChild(tr);
+  row.setAttribute("aria-label",d0.toDateString()+" — tap to chart this day");
+  function pick(){selected=k;drawLevel();
+    [].forEach.call(grid.children,function(c){c.style.opacity="";});
+    row.style.opacity="1";}
+  row.addEventListener("click",pick);
+  row.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}});
+  if(isToday)selected=k;
+  grid.appendChild(row);
+});
+var rt=document.getElementById("rticks");
+["12am","3am","6am","9am","noon","3pm","6pm","9pm","12am"].forEach(function(t,i){
+  var s=document.createElement("span");s.textContent=t;s.style.left=(i/8*100)+"%";rt.appendChild(s);});
+grid.appendChild(document.querySelector(".raxis"));
+
+/* ---- closure table ---- */
+var tb=document.querySelector("#closetbl tbody");
+D.closures.forEach(function(c){
+  var a=P(c.start),b=P(c.end),st=stateFor(Math.max(c.over_in,0.5));
+  var tr=document.createElement("tr");
+  tr.innerHTML="<td>"+a.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+"</td>"+
+    '<td class="num">'+fmtT(a)+" – "+fmtT(b)+"</td>"+
+    '<td class="num">'+fmtDur((b-a)/60000)+"</td>"+
+    '<td class="num">'+(c.over_in<1?"<1 in":c.over_in+" in")+'</td>'+
+    '<td><span class="chip" style="background:'+st.bg+';color:var(--ink)"><i style="background:'+
+      st.color+'"></i>'+st.lab+"</span></td>";
+  tb.appendChild(tr);
+});
+
+/* ---- level chart ---- */
+var svg=document.getElementById("lvl"),tip=document.getElementById("tip");
+var W=900,H=320,M={t:16,r:56,b:30,l:44};
+function drawLevel(){
+  var pts=days[selected]||series.slice(0,240);
+  var lo=Math.min(ROAD-UNC-0.6,Math.min.apply(null,pts.map(function(p){return p.lvl;}))-0.4);
+  var hi=Math.max(ROAD+UNC+0.4,Math.max.apply(null,pts.map(function(p){return p.lvl;}))+0.4);
+  var x=function(i){return M.l+(i/(pts.length-1))*(W-M.l-M.r);};
+  var y=function(v){return M.t+(1-(v-lo)/(hi-lo))*(H-M.t-M.b);};
+  var s="";
+  /* grid */
+  var step=(hi-lo)>6?2:1;
+  for(var g=Math.ceil(lo);g<=hi;g+=step){
+    s+='<line x1="'+M.l+'" x2="'+(W-M.r)+'" y1="'+y(g).toFixed(1)+'" y2="'+y(g).toFixed(1)+
+       '" stroke="var(--rule-2)" stroke-width="1"/>';
+    s+='<text x="'+(M.l-8)+'" y="'+(y(g)+4).toFixed(1)+'" text-anchor="end" font-size="13" '+
+       'font-family="var(--mono)" fill="var(--muted)">'+g+"</text>";
+  }
+  /* road uncertainty band + line */
+  s+='<rect x="'+M.l+'" y="'+y(ROAD+UNC).toFixed(1)+'" width="'+(W-M.l-M.r)+'" height="'+
+     (y(ROAD-UNC)-y(ROAD+UNC)).toFixed(1)+'" fill="var(--critical-bg)"/>';
+  s+='<line x1="'+M.l+'" x2="'+(W-M.r)+'" y1="'+y(ROAD).toFixed(1)+'" y2="'+y(ROAD).toFixed(1)+
+     '" stroke="#d03b3b" stroke-width="2" stroke-dasharray="7 4"/>';
+  s+='<text x="'+(W-M.r+7)+'" y="'+(y(ROAD)-4).toFixed(1)+'" font-size="12.5" font-family="var(--mono)" '+
+     'fill="#d03b3b">road</text>';
+  s+='<text x="'+(W-M.r+7)+'" y="'+(y(ROAD)+10).toFixed(1)+'" font-size="12.5" font-family="var(--mono)" '+
+     'fill="var(--muted)">±'+(UNC*12).toFixed(0)+'in</text>';
+  /* water area + line */
+  var area="M "+x(0)+" "+y(lo),line="";
+  pts.forEach(function(p,i){area+=" L "+x(i).toFixed(1)+" "+y(p.lvl).toFixed(1);
+    line+=(i?" L ":"M ")+x(i).toFixed(1)+" "+y(p.lvl).toFixed(1);});
+  area+=" L "+x(pts.length-1)+" "+y(lo)+" Z";
+  s+='<path d="'+area+'" fill="var(--water-fill)"/>';
+  s+='<path d="'+line+'" fill="none" stroke="var(--water)" stroke-width="2" stroke-linejoin="round"/>';
+  /* x ticks */
+  for(var t=0;t<pts.length;t+=Math.floor(pts.length/6)){
+    s+='<text x="'+x(t).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="13" '+
+       'font-family="var(--mono)" fill="var(--muted)">'+fmtT(pts[t].d)+"</text>";
+  }
+  /* now marker */
+  var n=nowET();
+  if(n>=pts[0].d&&n<=pts[pts.length-1].d){
+    var fi=(n-pts[0].d)/(pts[pts.length-1].d-pts[0].d)*(pts.length-1);
+    s+='<line x1="'+x(fi).toFixed(1)+'" x2="'+x(fi).toFixed(1)+'" y1="'+M.t+'" y2="'+(H-M.b)+
+       '" stroke="var(--accent)" stroke-width="2"/>';
+  }
+  s+='<rect id="hit" x="'+M.l+'" y="'+M.t+'" width="'+(W-M.l-M.r)+'" height="'+(H-M.t-M.b)+
+     '" fill="transparent"/>';
+  s+='<g id="cross" opacity="0"><line y1="'+M.t+'" y2="'+(H-M.b)+'" stroke="var(--ink-2)" '+
+     'stroke-width="1"/><circle r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"/></g>';
+  svg.innerHTML=s;
+  var hit=svg.querySelector("#hit"),cross=svg.querySelector("#cross");
+  function move(ev){
+    var r=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX);
+    var px=(cx-r.left)/r.width*W;
+    var i=Math.round((px-M.l)/(W-M.l-M.r)*(pts.length-1));
+    if(i<0||i>=pts.length){cross.setAttribute("opacity","0");tip.style.opacity=0;return;}
+    var p=pts[i];cross.setAttribute("opacity","1");
+    cross.querySelector("line").setAttribute("x1",x(i));cross.querySelector("line").setAttribute("x2",x(i));
+    cross.querySelector("circle").setAttribute("cx",x(i));cross.querySelector("circle").setAttribute("cy",y(p.lvl));
+    var st=stateFor(p.inch);
+    tip.innerHTML='<div class="t">'+fmtT(p.d)+'</div><div class="l">'+p.lvl.toFixed(2)+' ft</div>'+
+      '<div class="d" style="color:'+st.color+'">'+(p.inch>0?Math.round(p.inch)+" in over road":
+      Math.abs(Math.round(p.inch))+" in below road")+'</div>'+
+      '<div class="t" style="margin-top:4px">tide '+p.astro.toFixed(2)+' + surge '+
+      (p.surge>=0?"+":"")+p.surge.toFixed(2)+'</div>';
+    tip.style.opacity=1;
+    var lft=x(i)/W*r.width+14; if(lft>r.width-165)lft=x(i)/W*r.width-165;
+    tip.style.left=lft+"px"; tip.style.top="14px";
+  }
+  hit.addEventListener("mousemove",move); hit.addEventListener("touchmove",move,{passive:true});
+  hit.addEventListener("mouseleave",function(){cross.setAttribute("opacity","0");tip.style.opacity=0;});
+}
+drawLevel();
+
+/* ---- road profile ---- */
+(function(){
+  var el=document.getElementById("prof");
+  var pts=PROF.filter(function(p){return p.d>=205&&p.d<=870;});
+  var W2=900,H2=250,m={t:20,r:66,b:38,l:50};
+  var real=pts.filter(function(p){return !p.channel;});
+  var lo=9.7, hi=Math.min(Math.max.apply(null,real.map(function(p){return p.mllw;}))+0.4, 15);
+  var d0=pts[0].d,d1=pts[pts.length-1].d;
+  var x=function(d){return m.l+(d-d0)/(d1-d0)*(W2-m.l-m.r);};
+  var y=function(v){return m.t+(1-(Math.min(Math.max(v,lo),hi)-lo)/(hi-lo))*(H2-m.t-m.b);};
+  var peak=Math.max.apply(null,(days[selected]||series).map(function(p){return p.lvl;}));
+  var s="";
+  for(var g=10;g<=hi;g++){
+    s+='<line x1="'+m.l+'" x2="'+(W2-m.r)+'" y1="'+y(g).toFixed(1)+'" y2="'+y(g).toFixed(1)+
+       '" stroke="var(--rule-2)"/>';
+    s+='<text x="'+(m.l-9)+'" y="'+(y(g)+4).toFixed(1)+'" text-anchor="end" font-size="13" '+
+       'font-family="var(--mono)" fill="var(--muted)">'+g+"</text>";
+  }
+  /* 1. water body first, then opaque land on top of it -> water shows only where it covers road */
+  s+='<rect x="'+m.l+'" y="'+y(peak).toFixed(1)+'" width="'+(W2-m.l-m.r)+'" height="'+
+     (H2-m.b-y(peak)).toFixed(1)+'" fill="var(--water)" opacity="0.32"/>';
+  var ar="M "+x(d0)+" "+(H2-m.b), ln="";
+  real.forEach(function(p,i){ ln+=(i?" L ":"M ")+x(p.d).toFixed(1)+" "+y(p.mllw).toFixed(1);
+    ar+=" L "+x(p.d).toFixed(1)+" "+y(p.mllw).toFixed(1); });
+  ar+=" L "+x(d1)+" "+(H2-m.b)+" Z";
+  s+='<path d="'+ar+'" fill="var(--surface-2)"/>';
+  /* 2. road-height uncertainty, as rules not a wash */
+  [ROAD-UNC,ROAD+UNC].forEach(function(v){
+    s+='<line x1="'+m.l+'" x2="'+(W2-m.r)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+
+       '" stroke="#d03b3b" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>';});
+  /* 3. water surface */
+  s+='<line x1="'+m.l+'" x2="'+(W2-m.r)+'" y1="'+y(peak).toFixed(1)+'" y2="'+y(peak).toFixed(1)+
+     '" stroke="var(--water)" stroke-width="2.5"/>';
+  s+='<text x="'+(W2-m.r+8)+'" y="'+(y(peak)-5).toFixed(1)+'" font-size="12.5" '+
+     'font-family="var(--mono)" fill="var(--water)">today’s</text>';
+  s+='<text x="'+(W2-m.r+8)+'" y="'+(y(peak)+9).toFixed(1)+'" font-size="12.5" '+
+     'font-family="var(--mono)" fill="var(--water)">peak</text>';
+  /* 4. road surface on top */
+  s+='<path d="'+ln+'" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>';
+  /* 5. low point */
+  var low=real.reduce(function(a,b){return b.mllw<a.mllw?b:a;});
+  s+='<circle cx="'+x(low.d).toFixed(1)+'" cy="'+y(low.mllw).toFixed(1)+'" r="5.5" fill="#d03b3b" '+
+     'stroke="var(--surface)" stroke-width="2"/>';
+  s+='<text x="'+x(low.d).toFixed(1)+'" y="'+(y(low.mllw)+22).toFixed(1)+'" text-anchor="middle" '+
+     'font-size="13" font-family="var(--mono)" fill="#d03b3b">low point '+low.mllw.toFixed(1)+' ft</text>';
+  /* 6. the bridge gap */
+  var ch=PROF.filter(function(p){return p.channel;});
+  if(ch.length){
+    var cx=(x(ch[0].d)+x(ch[ch.length-1].d))/2;
+    s+='<line x1="'+cx.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y1="'+(H2-m.b)+'" y2="'+(m.t+8)+
+       '" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s+='<text x="'+cx.toFixed(1)+'" y="'+(m.t+2)+'" text-anchor="middle" font-size="12" '+
+       'font-family="var(--mono)" fill="var(--muted)">creek</text>';
+  }
+  s+='<text x="'+m.l+'" y="'+(H2-10)+'" font-size="12.5" font-family="var(--mono)" '+
+     'fill="var(--muted)">mainland</text>';
+  s+='<text x="'+((m.l+W2-m.r)/2)+'" y="'+(H2-10)+'" text-anchor="middle" font-size="12.5" '+
+     'font-family="var(--mono)" fill="var(--muted)">'+Math.round(d1-d0)+' m of causeway</text>';
+  s+='<text x="'+(W2-m.r)+'" y="'+(H2-10)+'" text-anchor="end" font-size="12.5" '+
+     'font-family="var(--mono)" fill="var(--muted)">island</text>';
+  el.innerHTML=s;
+})();
+})();
+</script>

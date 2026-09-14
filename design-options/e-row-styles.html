@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option E Row Styles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.wrap{max-width:2200px;margin:0 auto;padding:30px 24px 60px}
+.wrap h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:78ch;margin:8px 0 0;font-size:15px}
+.lede a{color:var(--accent)}
+.grid{display:flex;flex-wrap:wrap;gap:32px;margin-top:26px}
+figure{margin:0;width:390px}
+figcaption{margin-bottom:12px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption .id em{font-style:normal;color:var(--accent)}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 6px;font-size:13.5px;color:var(--ink-2);min-height:44px}
+figcaption a{font-size:13px;color:var(--accent);font-weight:600}
+iframe{display:block;width:390px;height:844px;border:1px solid var(--rule);border-radius:30px;background:var(--ground);box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · Option E · row styles</div>
+  <h1>Less crowded rows</h1>
+  <p class="lede">The same page five times on the same live data — only the row typography changes. Look at a closure row: the crossing time, and the high-tide line under it.
+    <a href="round-2.html">Back to round two →</a></p>
+  <div class="grid">
+    <figure><figcaption><div class="id">1 · for reference</div><b>Current</b>
+      <p>Bold monospace time, with a bold monospace high-tide time underneath.</p>
+      <a href="e-tagged.html?style=current" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html?style=current" title="Row style 1: current"></iframe></figure>
+    <figure><figcaption><div class="id">2</div><b>Quiet subtext</b>
+      <p>The high-tide line drops to regular weight in the body font, with a little more space. Main time unchanged.</p>
+      <a href="e-tagged.html?style=quiet" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html?style=quiet" title="Row style 2: quiet subtext"></iframe></figure>
+    <figure><figcaption><div class="id">3 · <em>recommended</em></div><b>Quiet + softer time</b>
+      <p>As 2, and the crossing time moves to the body font at a lighter weight — still the headline, less blocky.</p>
+      <a href="e-tagged.html?style=soft" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html?style=soft" title="Row style 3: quiet subtext and softer time"></iframe></figure>
+    <figure><figcaption><div class="id">4</div><b>Shorter</b>
+      <p>As 3, with “High 2:07am · 10.6 ft” instead of “High tide”.</p>
+      <a href="e-tagged.html?style=short" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html?style=short" title="Row style 4: shorter subtext"></iframe></figure>
+    <figure><figcaption><div class="id">5</div><b>Icon</b>
+      <p>As 3, with a small wave icon instead of the words. The least text; the key explains the icon.</p>
+      <a href="e-tagged.html?style=icon" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="e-tagged.html?style=icon" title="Row style 5: icon"></iframe></figure>
+  </div>
+</div>
+</body>
+</html>

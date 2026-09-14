@@ -1,0 +1,9 @@
+Gauge share schedules, 911 tides Jan 2024-Jul 2026: typical error (RMSE, inches) by hours before the tide
+schedule                                    1 h    3 h    6 h   12 h   24 h   48 h  avg 1-60 h
+forecast only, never the gauge             3.92   3.92   3.92   3.92   3.82   3.94        3.90
+CURRENT: 100% to 6 h, 0% by 18 h           2.43   3.00   4.14   3.25   3.82   3.94        3.58
+flat 50% up to 24 h                        2.54   2.84   3.41   3.25   3.66   3.94        3.51
+flat 50% up to 48 h                        2.54   2.84   3.41   3.25   3.66   4.22        3.61
+one slide: 70% now -> 0% at 3 days         2.29   2.73   3.50   3.31   3.60   3.79        3.50
+fitted shape: 80/45/45/30/20/0%            2.27   2.74   3.41   3.24   3.45   3.78        3.40
+(the fitted shape was read off this same data, so it's slightly flattered; the others weren't fitted)

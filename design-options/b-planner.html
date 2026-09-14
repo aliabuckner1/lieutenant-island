@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crossing · B · Week planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.grid{margin-top:16px;display:grid;grid-template-columns:48px repeat(4,minmax(0,1fr));gap:4px}
+.gh{font-size:11px;font-weight:600;color:var(--ink-2);text-align:center;line-height:1.15;padding-bottom:3px}
+.gh small{display:block;font-family:var(--mono);font-size:9.5px;color:var(--muted);font-weight:400;margin-top:1px}
+.dl{display:flex;flex-direction:column;justify-content:center;line-height:1.15}
+.dl b{font-family:var(--display);font-size:14px}
+.dl span{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.dl.today b{color:var(--accent)}
+.cell{min-height:60px;border-radius:9px;background:var(--surface);border:1px solid var(--rule-2);padding:5px 2px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;color:var(--ink);text-align:center}
+.cell .t{font-family:var(--mono);font-size:11px;font-weight:600;line-height:1.25;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.cell .d{font-size:10px;color:var(--ink-2);line-height:1.25;margin-top:1px}
+.cell .cont{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);line-height:1.25}
+.cell.near{border:1.5px dashed var(--muted)}
+.cell.past{opacity:.38}
+.cell.cur{box-shadow:inset 0 0 0 2px var(--accent)}
+.cell.sel{outline:2px solid var(--ink);outline-offset:1px}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12px;color:var(--ink-2)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:14px;height:11px;border-radius:3px}
+.sw.nr{border:1.5px dashed var(--muted)}
+.panel{margin-top:14px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:13px 16px 8px;box-shadow:var(--shadow)}
+.panel h2{font-family:var(--display);font-size:17px;margin:0 0 4px;font-weight:700}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule-2)}
+.prow .pt{font-family:var(--mono);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.prow .pm{font-size:12.5px;color:var(--muted)}
+.prow .pd{font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pnone{font-size:14px;color:var(--muted);padding:6px 0 8px}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">Lieutenant Island · Wellfleet</div>
+  <h1>Causeway crossing</h1>
+  <div class="statusline" id="status" hidden></div>
+  <div class="loading" id="loading">Checking the tide…</div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <div class="grid" id="grid"></div>
+  <div class="key" id="key" hidden>
+    <span><i class="sw" style="background:var(--shallow-bg)"></i>under 6 in</span>
+    <span><i class="sw" style="background:var(--deep-bg)"></i>6–15 in</span>
+    <span><i class="sw" style="background:var(--shut-bg)"></i>15 in +</span>
+    <span><i class="sw nr"></i>close call</span>
+  </div>
+  <div class="panel" id="panel" hidden></div>
+  <p class="fresh" id="fresh"></p>
+</main>
+<script src="tide-data.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.Tides,MODEL=null,sel=null;
+var BK=[{n:"Overnight",s:0,sub:"12–6am"},{n:"Morning",s:6,sub:"6am–12"},{n:"Afternoon",s:12,sub:"12–6pm"},{n:"Evening",s:18,sub:"6pm–12"}];
+function el(id){return document.getElementById(id);}
+function c2(ms){return T.fmtT(ms).replace("am","a").replace("pm","p");}
+function cellInfo(M,k,b){
+  var a=k+BK[b].s*T.HOUR,z=a+6*T.HOUR;
+  var over=M.closures.filter(function(c){return c.s<z&&c.e>=a;});
+  return {a:a,z:z,over:over,starts:over.filter(function(c){return c.s>=a;}),
+    near:M.near.filter(function(x){return x.ms>=a&&x.ms<z;}),
+    worst:over.reduce(function(m,c){return Math.max(m,T.inchesOver(c));},0)};
+}
+function render(M){
+  MODEL=M;
+  el("loading").hidden=true;el("err").hidden=true;el("status").hidden=false;el("key").hidden=false;el("panel").hidden=false;
+  el("status").innerHTML=T.statusLineHTML(M);
+  var n=T.nowW(),today=T.dayStart(n),first=M.series[0].ms;
+  if(!sel||!M.days[sel.k]){
+    var nx=M.closures.filter(function(c){return c.e>=n;})[0],t=nx?Math.max(nx.s,n):n;
+    sel={k:T.dayStart(t),b:Math.floor(new Date(t).getUTCHours()/6)};
+  }
+  var h='<div></div>'+BK.map(function(b){return '<div class="gh">'+b.n+'<small>'+b.sub+'</small></div>';}).join("");
+  M.order.forEach(function(k){
+    h+='<div class="dl'+(k===today?" today":"")+'"><b>'+(k===today?"Today":T.fmtD(k,{weekday:"short"}))+'</b><span>'+
+      T.fmtD(k,{month:"short",day:"numeric"})+'</span></div>';
+    for(var b=0;b<4;b++){
+      var ci=cellInfo(M,k,b),cls="cell",style="",inner="",label=T.fmtD(k,{weekday:"long"})+" "+BK[b].n.toLowerCase()+": ";
+      if(ci.over.length){var st=T.stateFor(ci.worst);style="background:var(--"+st.cls+"-bg);border-color:transparent";}
+      if(ci.starts.length){
+        inner=ci.starts.map(function(c){
+          return c.s===first
+            ?'<div class="cont">until</div><div class="t">'+c2(c.e)+'</div><div class="d">'+T.depthTxt(T.inchesOver(c))+'</div>'
+            :'<div class="t">'+c2(c.s)+'</div><div class="t">–'+c2(c.e)+'</div><div class="d">'+T.depthTxt(T.inchesOver(c))+'</div>';
+        }).join("");
+        label+="closed "+ci.starts.map(function(c){return T.fmtT(c.s)+" to "+T.fmtT(c.e)+", up to "+T.depthTxt(T.inchesOver(c));}).join("; ");
+      }else if(ci.over.length){
+        inner='<div class="cont">until</div><div class="t">'+c2(ci.over[0].e)+'</div>';
+        label+="closed until "+T.fmtT(ci.over[0].e);
+      }else if(ci.near.length){
+        cls+=" near";inner='<div class="d">close call</div><div class="t">'+c2(ci.near[0].ms)+'</div>';
+        label+="clear, close call at "+T.fmtT(ci.near[0].ms);
+      }else label+="clear";
+      if(ci.z<=n)cls+=" past";
+      if(ci.a<=n&&n<ci.z)cls+=" cur";
+      if(sel.k===k&&sel.b===b)cls+=" sel";
+      h+='<button type="button" class="'+cls+'" style="'+style+'" data-k="'+k+'" data-b="'+b+'" aria-label="'+label+'">'+inner+'</button>';
+    }
+  });
+  el("grid").innerHTML=h;
+  drawPanel(M);
+  el("fresh").innerHTML=T.freshHTML(M);
+}
+function drawPanel(M){
+  var k=sel.k,b=sel.b,ci=cellInfo(M,k,b),n=T.nowW(),h='<h2>'+T.dayName(k,n)+", "+BK[b].n.toLowerCase()+'</h2>';
+  ci.over.forEach(function(c){
+    var inch=T.inchesOver(c),st=T.stateFor(inch);
+    h+='<div class="prow"><div><div class="pt">'+(c.s===M.series[0].ms?"until ":T.fmtT(c.s)+" – ")+T.fmtT(c.e)+'</div>'+
+      '<div class="pm">Under water '+T.fmtDur((c.e-c.s)/T.MIN)+(T.dayStart(c.s)!==k?" · started the day before":"")+'</div></div>'+
+      '<span class="pd"><i class="dot" style="background:'+st.color+'"></i>up to '+T.depthTxt(inch)+'</span></div>';
+  });
+  ci.near.forEach(function(x){
+    h+='<div class="prow"><div><div class="pt">'+T.fmtT(x.ms)+'</div><div class="pm">Close call — peaks '+T.shortBy(x)+' below the road, could still wet it</div></div></div>';
+  });
+  if(!ci.over.length&&!ci.near.length)h+='<div class="pnone">No water on the road all '+BK[b].n.toLowerCase()+' ('+BK[b].sub+').</div>';
+  el("panel").innerHTML=h;
+}
+el("grid").addEventListener("click",function(e){
+  var c=e.target.closest(".cell");if(!c||!MODEL)return;
+  sel={k:+c.getAttribute("data-k"),b:+c.getAttribute("data-b")};render(MODEL);
+});
+T.run({render:render,
+  tick:function(M){el("status").innerHTML=T.statusLineHTML(M);},
+  error:function(err,M){
+    if(M){el("fresh").innerHTML=T.freshHTML(M,"couldn’t refresh — showing the last good data");return;}
+    el("loading").hidden=true;el("err").hidden=false;el("err").innerHTML=T.errorHTML(err);}});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crossing · C · Day timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.statusline{margin-top:14px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:12px;padding:11px 14px;font-size:15px;color:var(--ink-2);box-shadow:var(--shadow)}
+.statusline b{font-family:var(--display);color:var(--ink);font-size:16px}
+.statusline .dot{width:11px;height:11px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:16px -16px 0;padding:2px 16px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;padding:8px 6px 9px;border-radius:12px;
+  border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip .cd{font-size:12px;color:var(--muted);font-weight:600}
+.chip .cn{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.2}
+.chip .cb{display:block;width:24px;height:4px;border-radius:2px;margin-top:4px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.chip.on .cd{color:var(--surface);opacity:.75}
+.daytitle{margin-top:14px;display:flex;flex-direction:column;gap:1px}
+.daytitle b{font-family:var(--display);font-size:20px}
+.daytitle span{font-size:13.5px;color:var(--muted)}
+.tl{margin-top:10px;display:grid;grid-template-columns:42px 1fr;background:var(--surface);border:1px solid var(--rule);
+  border-radius:14px;padding:12px 12px 12px 2px;box-shadow:var(--shadow)}
+.hours{position:relative}
+.hours span{position:absolute;right:8px;transform:translateY(-50%);font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.lane{position:relative;background-image:repeating-linear-gradient(to bottom,var(--rule-2) 0,var(--rule-2) 1px,transparent 1px,transparent 26px)}
+.blk{position:absolute;left:0;right:0;border-radius:10px;padding:6px 10px 6px 16px;overflow:hidden;border:1px solid #0f20270f}
+.blk .edge{position:absolute;left:0;top:0;bottom:0;width:6px}
+.blk .bt{font-family:var(--mono);font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.blk .bm{font-size:12.5px;color:var(--ink-2)}
+.blk.past{opacity:.5}
+.nm{position:absolute;left:0;right:0;height:0;border-top:2px dashed var(--muted)}
+.nm span{position:absolute;right:4px;top:-19px;font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--surface);padding:0 5px}
+.nowl{position:absolute;left:-8px;right:0;height:0;border-top:2px solid var(--accent);z-index:3}
+.nowl::before{content:"";position:absolute;left:-3px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.nowl span{position:absolute;left:10px;top:-18px;font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--accent);background:var(--surface);padding:0 4px}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">Lieutenant Island · Wellfleet</div>
+  <h1>Causeway crossing</h1>
+  <div class="statusline" id="status" hidden></div>
+  <div class="loading" id="loading">Checking the tide…</div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <nav class="chips" id="chips" aria-label="Choose a day"></nav>
+  <div class="daytitle" id="daytitle"></div>
+  <div class="tl" id="tl" hidden><div class="hours" id="hours"></div><div class="lane" id="lane"></div></div>
+  <p class="fresh" id="fresh"></p>
+</main>
+<script src="tide-data.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.Tides,PX=26,sel=null,MODEL=null;
+function el(id){return document.getElementById(id);}
+(function(){var h="",labels=["12am","3am","6am","9am","noon","3pm","6pm","9pm","12am"];
+  labels.forEach(function(l,i){h+='<span style="top:'+(i*3*PX)+'px">'+l+'</span>';});
+  el("hours").innerHTML=h;})();
+function statusHTML(M){
+  var s=T.statusNow(M),n=s.now;
+  if(!s.wet)return '<i class="dot" style="background:var(--clear)"></i><div><b>Clear now</b> · '+
+    (s.change?"closes "+T.whenTxt(s.change,n):"no closures this week")+'</div>';
+  return '<i class="dot" style="background:'+s.state.color+'"></i><div><b>Under water now</b> · '+
+    (s.change?"reopens "+T.whenTxt(s.change,n):"through the forecast")+'</div>';
+}
+function overlapping(M,k){return M.closures.filter(function(c){return c.s<k+T.DAY&&c.e>=k;});}
+function chipsHTML(M,n){
+  return M.order.map(function(k){
+    var cl=overlapping(M,k),worst=cl.reduce(function(a,c){return Math.max(a,T.inchesOver(c));},0),
+        nm=M.near.some(function(x){return T.dayStart(x.ms)===k;});
+    var bar=worst>0?"background:"+T.stateFor(worst).color:(nm?"height:0;border-top:2px dashed var(--muted)":"background:var(--rule)");
+    return '<button type="button" class="chip'+(k===sel?" on":"")+'" data-k="'+k+'" aria-pressed="'+(k===sel)+'">'+
+      '<span class="cd">'+(k===T.dayStart(n)?"Today":T.fmtD(k,{weekday:"short"}))+'</span>'+
+      '<span class="cn">'+T.fmtD(k,{day:"numeric"})+'</span><i class="cb" style="'+bar+'"></i></button>';
+  }).join("");
+}
+function drawDay(M){
+  var k=sel,n=T.nowW(),H=24*PX,html="",cl=overlapping(M,k),nm=M.near.filter(function(x){return T.dayStart(x.ms)===k;});
+  var deepest=cl.reduce(function(a,c){return Math.max(a,T.inchesOver(c));},0);
+  el("daytitle").innerHTML='<b>'+T.dayName(k,n)+', '+T.fmtD(k,{month:"long",day:"numeric"})+'</b><span>'+
+    (cl.length?cl.length+(cl.length===1?" closure":" closures")+" · deepest "+T.depthTxt(deepest):"No closures — clear all day")+
+    (nm.length?" · "+nm.length+(nm.length===1?" close call":" close calls"):"")+'</span>';
+  cl.forEach(function(c){
+    var s=Math.max(c.s,k),e=Math.min(c.e,k+T.DAY),top=(s-k)/T.HOUR*PX,h=Math.max((e-s)/T.HOUR*PX,42);
+    if(top+h>H)top=H-h;
+    var inch=T.inchesOver(c),st=T.stateFor(inch),span=Math.max(e-s,1);
+    var pts=M.series.filter(function(p){return p.ms>=s&&p.ms<=e;});
+    var edge=pts.length>1?"linear-gradient(180deg,"+pts.map(function(p){
+      return T.stateFor(p.inch).color+" "+((p.ms-s)/span*100).toFixed(1)+"%";}).join(",")+")":st.color;
+    html+='<div class="blk'+(c.e<n?" past":"")+'" style="top:'+top.toFixed(1)+'px;height:'+h.toFixed(1)+'px;background:var(--'+st.cls+'-bg)">'+
+      '<i class="edge" style="background:'+edge+'"></i>'+
+      '<div class="bt">'+(c.s<=k?"until ":T.fmtT(c.s)+" – ")+T.fmtT(c.e)+'</div>'+
+      '<div class="bm">'+T.fmtDur((c.e-c.s)/T.MIN)+" · up to "+T.depthTxt(inch)+'</div></div>';
+  });
+  nm.forEach(function(x){
+    html+='<div class="nm" style="top:'+((x.ms-k)/T.HOUR*PX).toFixed(1)+'px"><span>'+T.fmtT(x.ms)+' · close call, '+T.shortBy(x)+' short</span></div>';
+  });
+  if(k===T.dayStart(n))html+='<div class="nowl" style="top:'+((n-k)/T.HOUR*PX).toFixed(1)+'px"><span>now '+T.fmtT(n)+'</span></div>';
+  el("lane").innerHTML=html;el("lane").style.height=H+"px";el("hours").style.height=H+"px";
+}
+function render(M){
+  MODEL=M;
+  el("loading").hidden=true;el("err").hidden=true;el("status").hidden=false;el("tl").hidden=false;
+  var n=T.nowW();
+  if(sel==null||!M.days[sel])sel=M.days[T.dayStart(n)]?T.dayStart(n):M.order[0];
+  el("status").innerHTML=statusHTML(M);
+  el("chips").innerHTML=chipsHTML(M,n);
+  drawDay(M);
+  el("fresh").innerHTML=T.freshHTML(M);
+}
+el("chips").addEventListener("click",function(e){
+  var b=e.target.closest(".chip");if(!b||!MODEL)return;
+  sel=+b.getAttribute("data-k");el("chips").innerHTML=chipsHTML(MODEL,T.nowW());drawDay(MODEL);
+});
+T.run({render:render,
+  tick:function(M){el("status").innerHTML=statusHTML(M);drawDay(M);},
+  error:function(err,M){
+    if(M){el("fresh").innerHTML=T.freshHTML(M,"couldn’t refresh — showing the last good data");return;}
+    el("loading").hidden=true;el("err").hidden=false;el("err").innerHTML=T.errorHTML(err);}});
+})();
+</script>
+</body>
+</html>

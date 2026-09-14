@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crossing · H · Tap to expand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.days{margin-top:14px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.dayrow+.dayrow{border-top:1px solid var(--rule)}
+.sum{width:100%;display:grid;grid-template-columns:74px 1fr 16px;align-items:center;gap:10px;padding:12px 14px;
+  background:none;border:0;color:var(--ink);text-align:left;cursor:pointer}
+.dn b{display:block;font-family:var(--display);font-size:16px;line-height:1.15;font-weight:700}
+.dn span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.cxs{display:flex;flex-wrap:wrap;gap:5px}
+.cx{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.cx .ic{width:13px;height:13px}
+.dethi{padding:9px 0 8px;border-top:1px solid var(--rule-2)}
+.cx.near{border:1.5px dashed var(--muted);font-weight:500;color:var(--ink-2);padding:2px 8px}
+.cx.clear{color:var(--muted);font-weight:400;padding-left:0}
+.chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);
+  transition:transform .15s;justify-self:end;margin-top:-5px}
+.dayrow.open .chev{transform:rotate(-135deg);margin-top:4px}
+.det{display:none;padding:0 14px 6px}
+.dayrow.open .det{display:block}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--rule-2)}
+.when{font-family:var(--mono);font-size:16.5px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dur{font-size:12.5px;color:var(--muted)}
+.row.near .when{font-size:14.5px;font-weight:500;color:var(--ink-2)}
+.none{padding:10px 0 12px;border-top:1px solid var(--rule-2);font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">Lieutenant Island · Wellfleet</div>
+  <h1>Causeway crossing</h1>
+  <div class="statusline" id="status" hidden></div>
+  <div class="key" id="key" hidden>
+    <span><i class="dot" style="background:#fab219"></i>under 6 in</span>
+    <span><i class="dot" style="background:#ec835a"></i>6–15 in</span>
+    <span><i class="dot" style="background:#d03b3b"></i>15 in +</span>
+    <span><i class="nk"></i>close call</span>
+  </div>
+  <div class="loading" id="loading">Checking the tide…</div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <div class="days" id="days" hidden></div>
+  <p class="fresh" id="fresh"></p>
+</main>
+<script src="tide-data.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.Tides,MODEL=null,opened=null;
+function el(id){return document.getElementById(id);}
+function render(M){
+  MODEL=M;
+  el("loading").hidden=true;el("err").hidden=true;el("status").hidden=false;el("key").hidden=false;el("days").hidden=false;
+  el("status").innerHTML=T.statusLineHTML(M);
+  var n=T.nowW(),today=T.dayStart(n),first=M.series[0].ms,html="";
+  if(!opened){opened={};opened[today]=true;opened[today+T.DAY]=true;}
+  M.order.forEach(function(k){
+    var items=T.upcomingForDay(M,k,n),cls=items.filter(function(i){return i.c;}),nears=items.filter(function(i){return i.x;});
+    var chips=cls.map(function(i){var st=T.stateFor(T.inchesOver(i.c));
+        return '<span class="cx" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.slotIcon(T.slotIndex(M,i.c))+
+          T.slotLabel(M,i.c).toLowerCase()+'</span>';}).join("")+
+      nears.map(function(i){return '<span class="cx near">'+T.slotIcon(T.slotOf(i.x.ms))+'close call '+T.SLOTS[T.slotOf(i.x.ms)].n.toLowerCase()+'</span>';}).join("");
+    if(!cls.length&&!nears.length){
+      var hadEarlier=k===today&&M.closures.some(function(c){return T.dayStart(c.s)===k;});
+      chips='<span class="cx clear">'+(hadEarlier?"no more today":"clear all day")+'</span>';
+    }
+    var isOpen=!!opened[k];
+    html+='<div class="dayrow'+(isOpen?" open":"")+'"><button type="button" class="sum" data-k="'+k+'" aria-expanded="'+isOpen+'">'+
+      '<div class="dn"><b>'+T.dayName(k,n)+'</b><span>'+T.fmtD(k,{month:"short",day:"numeric"})+'</span></div>'+
+      '<div class="cxs">'+chips+'</div><i class="chev"></i></button><div class="det">';
+    if(!cls.length){
+      var earlierToday=k===today&&M.closures.some(function(c){return T.dayStart(c.s)===k;});
+      html+='<div class="none">'+(earlierToday?"No more closures today":
+        nears.length?"No closures — but see the close call below":"No water on the road all day")+'</div>';
+    }
+    items.forEach(function(it){
+      if(it.c){
+        var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch);
+        html+='<div class="row"><div><div class="when">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>'+
+          '<div class="dur">'+(c.s<=n?"under water now · ":T.slotLabel(M,c).toLowerCase()+" · ")+T.fmtDur((c.e-c.s)/T.MIN)+'</div></div>'+
+          '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span></div>';
+      }else{
+        var x=it.x;
+        html+='<div class="row near"><div><div class="when">close call '+T.fmtT(x.ms)+'</div><div class="dur">could still wet the road</div></div>'+
+          '<span class="pill nearpill">'+T.shortBy(x)+' short</span></div>';
+      }
+    });
+    var hi=T.highsHTML(M,k,n);if(hi)html+='<div class="hiline dethi">'+hi+'</div>';
+    html+='</div></div>';
+  });
+  el("days").innerHTML=html;
+  el("fresh").innerHTML=T.freshHTML(M);
+}
+el("days").addEventListener("click",function(e){
+  var b=e.target.closest(".sum");if(!b||!MODEL)return;
+  var k=b.getAttribute("data-k");opened[k]=!opened[k];
+  var row=b.parentNode;row.classList.toggle("open",!!opened[k]);b.setAttribute("aria-expanded",!!opened[k]);
+});
+T.run({render:render,
+  tick:function(M){el("status").innerHTML=T.statusLineHTML(M);},
+  error:function(err,M){
+    if(M){el("fresh").innerHTML=T.freshHTML(M,"couldn’t refresh — showing the last good data");return;}
+    el("loading").hidden=true;el("err").hidden=false;el("err").innerHTML=T.errorHTML(err);}});
+})();
+</script>
+</body>
+</html>

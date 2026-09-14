@@ -1,0 +1,64 @@
+911 Boston high tides, 2024-01-01 to 2026-07-31
+
+1. TYPICAL ERROR BY DAYS AHEAD (RMSE, inches; lower is better)
+   chart  = NOAA tide chart alone            +7in  = chart + the site's fixed typical amount
+   offset = chart + sea-level offset only     full  = offset + weather at full strength (the site now)
+   fade   = proposal: weather 100% to day 3, 0% by day 7
+   best w = best single weather weight;  best p/w = separate pressure and wind weights (cross-validated)
+days     n  chart   +7in  offset   full   fade          best w               best p/w
+   0   911   9.20   5.57    5.64   3.92   3.92     3.92 (w 1.05)     3.92 (p 1.05 w 1.05)
+   1   893   8.94   5.33    5.43   3.81   3.81     3.80 (w 0.93)     3.81 (p 1.01 w 0.85)
+   2   892   8.94   5.33    5.43   3.94   3.94     3.94 (w 0.94)     3.94 (p 1.01 w 0.87)
+   3   891   8.94   5.34    5.43   4.00   4.00     4.00 (w 0.92)     4.00 (p 1.00 w 0.83)
+   4   891   8.94   5.34    5.43   4.24   4.25     4.22 (w 0.89)     4.28 (p 0.96 w 0.81)
+   5   890   8.94   5.34    5.43   4.40   4.54     4.35 (w 0.83)     4.48 (p 0.91 w 0.76)
+   6   889   8.94   5.34    5.43   4.74   4.96     4.60 (w 0.71)     4.64 (p 0.82 w 0.58)
+   7   888   8.94   5.34    5.44   4.91   5.44     4.76 (w 0.68)     4.76 (p 0.80 w 0.52)
+   (days 0 = the same-day forecast run)
+   average miss at day 1 (actual minus forecast): chart +7.2 in, offset -0.9 in, full +0.6 in
+   reference, OBSERVED pressure + buoy wind instead of a forecast (2024-25, n=703): 4.22 in
+
+2. BIG SURGES ONLY (water came in more than 12 in above the chart): RMSE, inches, and average shortfall
+days    n  chart  offset   full   fade  best p/w   shortfall full / fade
+   0  148  16.80    9.41   6.55   6.55      6.50     +5.0 /   +5.0
+   1  138  16.25    8.71   6.18   6.18      6.10     +4.7 /   +4.7
+   2  138  16.25    8.71   6.03   6.03      5.97     +4.7 /   +4.7
+   3  138  16.25    8.71   6.16   6.16      6.08     +4.6 /   +4.6
+   4  138  16.25    8.71   6.75   7.01      6.70     +5.3 /   +5.9
+   5  138  16.25    8.71   7.09   7.60      7.07     +5.6 /   +6.7
+   6  138  16.25    8.71   7.55   8.12      7.28     +5.9 /   +7.3
+   7  138  16.25    8.71   8.13   8.71      7.82     +6.7 /   +7.8
+
+3. DOES THE ROAD FLOOD AT THIS TIDE? (Wellfleet = Boston x 1.05; tides whose actual peak was within 12 in of the road)
+days    n   % called wrong:   chart  offset   full   fade  best p/w
+   0  527                      42.3    19.0   14.6   14.6      14.0
+   1  519                      42.6    19.1   14.6   14.6      14.3
+   2  518                      42.5    19.1   15.3   15.3      14.9
+   3  517                      42.4    19.1   16.4   16.4      14.9
+   4  517                      42.4    19.1   18.0   16.4      16.2
+   5  516                      42.2    19.2   19.0   16.7      17.2
+   6  515                      42.3    19.2   19.8   17.9      17.1
+   7  514                      42.4    19.3   17.9   19.3      16.5
+
+4. LIVE BOSTON GAUGE vs WEATHER FORECAST, BY HOURS BEFORE THE TIDE: RMSE, inches
+   gauge = assume the reading an hour before 'now' holds; forecast = offset + weather (same-day run under 24 h);
+   old = previous mix (all gauge to 6 h, all forecast from 18 h); new = 70% gauge sliding to 0 at 3 days;
+   best = best mix at that hour (cross-validated)
+hours     n  gauge  forecast    old    new             best mix
+    1   910   2.43      3.92   2.43   2.29     2.26 (gauge  78%)
+    3   911   3.00      3.92   3.00   2.73     2.73 (gauge  69%)
+    6   910   4.14      3.92   4.14   3.50     3.41 (gauge  45%)
+    9   910   4.01      3.91   3.51   3.36     3.31 (gauge  48%)
+   12   911   4.20      3.92   3.25   3.31     3.25 (gauge  45%)
+   15   910   5.14      3.92   3.60   3.83     3.60 (gauge  30%)
+   18   910   5.87      3.92   3.92   4.23     3.80 (gauge  18%)
+   24   892   5.33      3.82   3.82   3.60     3.45 (gauge  29%)
+   36   893   6.14      3.81   3.81   3.76     3.66 (gauge  19%)
+   48   892   6.17      3.94   3.94   3.79     3.79 (gauge  18%)
+   60   892   6.27      3.94   3.94   3.82     3.82 (gauge  16%)
+   72   891   6.39      4.00   4.00   4.00     3.88 (gauge  17%)
+   average over these hours: old 3.61 in, new 3.52 in
+
+5. INPUT CHECK: same-day Open-Meteo forecast vs observed
+   pressure: forecast minus Boston observed averages +0.2 mb (n=23360)
+   wind speed: forecast averages 8.6 kt vs buoy 11.1 kt (n=17532)

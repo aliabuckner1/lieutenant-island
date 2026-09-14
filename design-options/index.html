@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Causeway Crossing Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+.wrap{max-width:1780px;margin:0 auto;padding:30px 24px 60px}
+.wrap h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:74ch;margin:8px 0 0;font-size:15px}
+.grid{display:flex;flex-wrap:wrap;gap:32px;margin-top:26px}
+figure{margin:0;width:390px}
+figcaption{margin-bottom:12px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 6px;font-size:13.5px;color:var(--ink-2);min-height:62px}
+figcaption a{font-size:13px;color:var(--accent);font-weight:600}
+iframe{display:block;width:390px;height:844px;border:1px solid var(--rule);border-radius:30px;background:var(--ground);box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Four ways to show the crossing</h1>
+  <p class="lede">All four lead with closures and are built for planning ahead rather than checking this minute. Each frame is phone-sized and runs on the same live tide data, so you're comparing layouts, not numbers. Scroll and tap inside any of them, or open one on its own.</p>
+  <div class="grid">
+    <figure><figcaption><div class="id">Option A</div><b>Tide table</b>
+      <p>Every closure listed by day with its time, part of the day and depth. Closest to a printed tide chart.</p>
+      <a href="a-table.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="a-table.html" title="Option A: tide table"></iframe></figure>
+    <figure><figcaption><div class="id">Option B</div><b>Week planner</b>
+      <p>Days down the side, overnight · morning · afternoon · evening across the top. Closure times sit in the cells; tap one for details.</p>
+      <a href="b-planner.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="b-planner.html" title="Option B: week planner"></iframe></figure>
+    <figure><figcaption><div class="id">Option C</div><b>Day timeline</b>
+      <p>Like a calendar's day view: pick a day, closures sit as blocks on a 24-hour column running down the phone.</p>
+      <a href="c-timeline.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="c-timeline.html" title="Option C: day timeline"></iframe></figure>
+    <figure><figcaption><div class="id">Option D</div><b>Day curve</b>
+      <p>Pick a day and see its tide against the road. Drag across the chart to check any time — "is 4pm Tuesday OK?"</p>
+      <a href="d-curve.html" target="_blank">Open on its own →</a></figcaption>
+      <iframe src="d-curve.html" title="Option D: day curve"></iframe></figure>
+  </div>
+</div>
+</body>
+</html>
