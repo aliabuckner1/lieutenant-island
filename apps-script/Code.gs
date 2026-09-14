@@ -59,7 +59,7 @@ function emailFor_(p, sheetUrl) {
 
   var lines = [who + ' reported the road ' + (wet ? 'wet' : 'dry') + (when ? ' at ' + when.time + ' on ' + when.longDay : '') + '.', '',
     'Seen at the road:',
-    '  • ' + (wet ? 'Wet' : 'Dry') + (p.depth_in ? ', about ' + p.depth_in + ' in deep (' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ')' : '')];
+    '  • ' + (wet ? 'Wet' : 'Dry') + (p.depth_in ? ', about ' + p.depth_in + ' in over the road (' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ')' : '')];
   if (p.edge === 'rising') lines.push('  • The water was only just coming over the road');
   if (p.edge === 'falling') lines.push('  • The water had only just gone off the road');
   if (fc != null) {

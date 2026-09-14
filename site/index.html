@@ -455,18 +455,20 @@ function compareTxt(rec,fc){
   var wet=rec.level!=="dry",fwet=fc.inch>0,d=rec.depth_in;
   if(wet&&fwet&&d!=null){var off=d-fc.inch;
     return Math.abs(off)<=3?"That’s close to the forecast.":
-      "That’s "+Math.round(Math.abs(off))+" in "+(off>0?"deeper":"shallower")+" than the forecast, which helps pin down the road’s real height.";}
-  if(Math.abs(fc.inch)<=6)return "That’s close to the edge, which is exactly where reports help pin down the road’s real height.";
+      "That’s "+Math.round(Math.abs(off))+" in "+(off>0?"deeper":"shallower")+" than the forecast.";}
+  if(Math.abs(fc.inch)<=6)return "The water was close to the road’s height, the most useful kind of report.";
   if(wet===fwet)return "That matches the forecast.";
-  if(Math.abs(fc.inch)>24)return "That’s a long way from the forecast. Worth double-checking the time?";
-  return "That’s different from the forecast, which makes it a really useful report.";
+  if(Math.abs(fc.inch)>24)return "That’s a long way from the forecast, so it’s worth double-checking the time.";
+  return "That’s different from the forecast.";
 }
+var HELPS="Reports like this help make the forecast more accurate.";
 function showThanks(rec,fc,all){
   var ms=T.parseWall(rec.seen_at),n=T.nowW(),msg="";
   if(fc)msg='<p>At '+T.fmtT(ms)+' the forecast had the water <b>'+(fc.inch>0?"about "+T.depthTxt(fc.inch)+" over the road":
       "about "+belowTxt(fc.inch)+" below the road")+'</b>.'+
-    (rec.depth_in!=null?' You '+(rec.depth_measured?"measured":"estimated")+' <b>'+inchTxt(rec.depth_in)+'</b>.':"")+
-    '</p><p>'+compareTxt(rec,fc)+'</p>';
+    (rec.depth_in!=null?' You '+(rec.depth_measured?"measured":"estimated")+' <b>'+inchTxt(rec.depth_in)+' over the road</b>.':"")+
+    '</p><p>'+compareTxt(rec,fc)+' '+HELPS+'</p>';
+  else msg='<p>'+HELPS+'</p>';
   var mine=all.slice(-5).reverse().map(function(r){var t=T.parseWall(r.seen_at);
     return '<div><b>'+T.dayName(T.dayStart(t),n)+' '+T.fmtT(t)+'</b> · '+LEVELS[r.level]+
       (r.depth_in!=null?", "+inchTxt(r.depth_in)+(r.depth_measured?" measured":" est."):"")+
