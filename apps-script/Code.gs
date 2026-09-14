@@ -53,10 +53,9 @@ function emailFor_(p, sheetUrl) {
   var when = p.seen_at ? wallTime_(p.seen_at) : null;
   var fc = p.forecast_in === '' || p.forecast_in == null ? null : Number(p.forecast_in);
   var fcWet = fc != null && fc > 0;
-  var surprise = fc != null && wet !== fcWet;
 
-  var subject = who + ' reported the road ' + (wet ? 'wet' : 'dry') + (when ? ' at ' + when.time + ' ' + when.shortDay : '') +
-    (surprise ? ' — forecast said ' + (fcWet ? 'wet' : 'dry') : '');
+  // the same start on every report, so they're easy to search for or filter into a label
+  var subject = 'Lt Island - Road Report (' + (p.observer || 'no name') + (when ? ', ' + when.date : '') + ')';
 
   var lines = [who + ' reported the road ' + (wet ? 'wet' : 'dry') + (when ? ' at ' + when.time + ' on ' + when.longDay : '') + '.', '',
     'Seen at the road:',
@@ -89,13 +88,13 @@ function inches_(x) {
   return x < 1 ? 'under 1 in' : x >= 24 ? (x / 12).toFixed(1) + ' ft' : Math.round(x) + ' in';
 }
 
-/* "2026-09-16T12:30" (Wellfleet time, as the site sends it) → 12:30pm, Wed Sep 16, Wednesday, September 16 */
+/* "2026-09-16T12:30" (Wellfleet time, as the site sends it) → 12:30pm, 9/16/2026, Wednesday, September 16 */
 function wallTime_(s) {
   var a = String(s).split(/[-T: ]/).map(Number);
   var day = new Date(Date.UTC(a[0], a[1] - 1, a[2])).getUTCDay();
   return {
     time: (a[3] % 12 || 12) + ':' + ('0' + a[4]).slice(-2) + (a[3] < 12 ? 'am' : 'pm'),
-    shortDay: DAYS[day].slice(0, 3) + ' ' + MONTHS[a[1] - 1].slice(0, 3) + ' ' + a[2],
+    date: a[1] + '/' + a[2] + '/' + a[0],
     longDay: DAYS[day] + ', ' + MONTHS[a[1] - 1] + ' ' + a[2]
   };
 }
