@@ -264,23 +264,19 @@ el("aboutBtn").addEventListener("click",openAbout);
 
 /* ---- about this page ---- */
 function openAbout(){
-  CTX=null;  /* a report started from here isn't about a particular tide */
   show(headHTML("About this page","Why we made it")+'<div class="about">'+
-    '<p>Most of us plan around the printed tide calendar, which uses NOAA’s tide predictions for Wellfleet. Those predictions are a rough guide at best, and they’ve been getting rougher. '+
-      'They’re pinned to average sea level from 1983–2001, and the sea at Boston has risen about 6½ inches since then. '+
-      'Today 94% of high tides come in higher than predicted, by about 8 inches on average, and the gap keeps growing. '+
-      'That’s why rules of thumb like “the road floods at 9.5 feet” have become less and less reliable.</p>'+
-    '<p>On top of that, the predictions ignore the weather: a strong northeast wind alone can add about 10 inches, and a strong southwest wind can take away about as much.</p>'+
+    '<p>Most of us use printed tide calendars, built from NOAA’s predictions for Wellfleet, to know when the road on and off the island will be flooded. '+
+      'Those predictions have grown less reliable. They’re pinned to 1983–2001 sea level, and the sea at Boston is over 6 inches higher now. '+
+      'Today 94% of high tides come in above the prediction, by about 8 inches on average. '+
+      'They also leave out the weather: a strong northeast wind can add about 10 inches, and a southwest one can take away as much.</p>'+
     '<div class="sec"><h3>How this page is more accurate</h3>'+
-      '<p>It starts from NOAA’s predictions and adds today’s higher sea level and the latest wind and pressure forecasts (from the National Weather Service and Open-Meteo), using a model built from more than 3,000 past high tides. '+
-        'For tides within the next 24 hours or so, it also leans on what the Boston tide gauge is measuring right now.</p>'+
-      '<p>We tested it by replaying about 900 high tides from 2024–26 with the forecasts available at the time. '+
-        'Against what Boston’s tide gauge actually measured, NOAA’s predictions were typically about 9 inches off; this page was about 4 inches off a day ahead and about 5 inches a week ahead.</p>'+
-      '<p>It also accounts for something few people know: Wellfleet’s tide goes out more slowly than it comes in, about 6½ hours falling versus 6 rising, so the road tends to stay covered a little longer after high tide than before it.</p></div>'+
-    '<div class="callout"><b>Seem off?</b> There’s no tide gauge at Wellfleet (NOAA’s numbers here are Boston’s, 60 miles away, adjusted), so reports from the road are our only real check. '+
-      'If the road ever doesn’t match this page, please tap <b>Report the road</b>. Every report helps make the forecast more accurate.</div>'+
-    '</div><button class="btn wide" type="button" data-act="report">'+PIN+'Report the road</button>'+
-    '<button class="btn wide" type="button" data-act="close">Done</button>');
+      '<p>Our model, built from more than 3,000 past high tides, adds today’s sea level and the latest wind and pressure forecasts to NOAA’s predictions. '+
+        'For tides within the next 24 hours or so, it also uses the live Boston tide gauge.</p>'+
+      '<p>We tested it on about 900 high tides from 2024–26: NOAA’s predictions were typically 9 inches off Boston’s tide gauge, and this page about 4 inches off a day ahead and 5 a week ahead.</p>'+
+      '<p>It also captures a fun Wellfleet quirk: the tide falls more slowly than it rises (about 6½ hours versus 6), so the road stays covered longer after high tide than before.</p></div>'+
+    '<div class="callout"><b>Seem off?</b> There’s no tide gauge at Wellfleet (its numbers come from Boston), so reports from the road are our only real check. '+
+      'If the road doesn’t match this page, tap <b>Report the road</b> to help improve the forecast.</div>'+
+    '</div><button class="btn wide" type="button" data-act="close">Done</button>');
 }
 
 /* ---- details for one tide ---- */
