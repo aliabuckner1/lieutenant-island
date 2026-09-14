@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Lieutenant Island High Tides</title>
+<title>Lt. Island Tides</title>
 <meta name="description" content="When the road to Lieutenant Island in Wellfleet is under water — closure times for the next eight days from live NOAA tides and the weather forecast.">
-<meta property="og:title" content="Lieutenant Island High Tides">
+<meta property="og:title" content="Lt. Island Tides">
 <meta property="og:description" content="When is the road to the island under water? Closure times for the next eight days.">
 <meta name="theme-color" content="#E9EFF1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C171B" media="(prefers-color-scheme: dark)">
@@ -38,6 +38,14 @@
 .s-short .when{font-family:var(--body);font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 .s-short .row.near .when{font-size:15px;font-weight:500}
 .none{padding:11px 2px 11px 112px;color:var(--muted);font-size:14px;border-bottom:1px solid var(--rule-2)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sub{font-size:14.5px;color:var(--ink-2);margin:3px 0 0;line-height:1.35}
+.top .x{margin-top:2px}
+.top .x .ic{width:19px;height:19px}
+.about p{font-size:14.5px;color:var(--ink-2);margin:8px 0 0;line-height:1.5}
+.about ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:var(--ink-2);line-height:1.45}
+.about li{margin-top:4px}
+.about b{color:var(--ink)}
 
 /* ---- tap a tide for details ---- */
 .actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
@@ -134,8 +142,14 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
 </head>
 <body>
 <main class="page">
-  <div class="brand">Lieutenant Island · Wellfleet</div>
-  <h1>High tides</h1>
+  <header class="top">
+    <div>
+      <div class="brand">Wellfleet</div>
+      <h1>Lt. Island Tides</h1>
+    </div>
+    <button class="x" id="aboutBtn" type="button" aria-label="About this page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5h.01"/></svg></button>
+  </header>
+  <p class="sub">When the road is under water, for the next 8&nbsp;days</p>
   <div class="statusline" id="status" hidden></div>
   <div class="actions" id="actions" hidden>
     <span class="hint">Tap a tide for details</span>
@@ -239,6 +253,27 @@ el("days").addEventListener("click",function(e){var it=rowFrom(e);if(it)openDeta
 el("days").addEventListener("keydown",function(e){
   if(e.key!=="Enter"&&e.key!==" ")return;var it=rowFrom(e);if(it){e.preventDefault();openDetail(it);}});
 el("reportBtn").addEventListener("click",function(){openReport(null);});
+el("aboutBtn").addEventListener("click",openAbout);
+
+/* ---- about this page ---- */
+function openAbout(){
+  show(headHTML("About this page","Why we made it")+'<div class="about">'+
+    '<p>The printed tide calendar most of the island uses has NOAA’s predictions for Wellfleet, which assume sea level as it was in 1983–2001. '+
+      'Sea level at Boston has risen about 6½ inches since then, so high tides now come in around 8–9 inches higher than the calendar says. '+
+      'When wind and weather push extra water in, it’s higher still. That’s why rules of thumb like “the road floods at 9.5 feet” stopped matching.</p>'+
+    '<div class="sec"><h3>What it does differently</h3><ul>'+
+      '<li>Starts from NOAA’s predictions and adds today’s higher sea level</li>'+
+      '<li>Adjusts for the wind (National Weather Service forecast) and air pressure (Open-Meteo)</li>'+
+      '<li>For the next day or so, leans on what NOAA’s Boston tide gauge is actually measuring (Wellfleet has no gauge)</li>'+
+      '<li>Compares the result with the height of the road, measured by USGS airborne laser mapping</li></ul></div>'+
+    '<div class="sec"><h3>How much better is it?</h3><p>We replayed 2024–26 high tides:</p><ul>'+
+      '<li>A typical tide was about <b>9 inches</b> off the calendar. This page is about <b>4 inches</b> off a day ahead (less within a few hours) and about 5 inches a week ahead.</li>'+
+      '<li>For tides near the road’s height, the calendar got “does the road flood?” wrong about <b>2 times in 5</b>. This page gets it wrong about <b>1 time in 7</b>.</li></ul>'+
+      '<p>Big storms still tend to come in higher than forecast, and the road’s height is only known to about ±6 inches, so give yourself some margin. Road reports help pin that down.</p></div>'+
+    '<div class="sec"><h3>A tide fact</h3><p>In Wellfleet the tide goes out more slowly than it comes in: about 6 hours rising, but about 6½ hours falling. '+
+      'So the road tends to stay covered a little longer after high tide than before it.</p></div>'+
+    '</div><button class="btn wide" type="button" data-act="close">Done</button>');
+}
 
 /* ---- details for one tide ---- */
 function inTxt(ft){var n=Math.round(ft*12);return n===0?"0 in":(n>0?"+":"−")+Math.abs(n)+" in";}
@@ -360,7 +395,7 @@ function sendState(ok,id){
   s.textContent=ok?"Report sent.":"Not sent yet. It’s saved on this phone and will send the next time you open this page with signal.";
 }
 function inchTxt(d){return (Math.round(d*2)/2)+" in";}
-/* a little cross-section of the causeway with the water at three heights */
+/* a little cross-section of the road with the water at three heights */
 function choice(v,title,sub,waterY){
   return '<label class="choice"><input type="radio" name="level" value="'+v+'">'+
     '<svg class="xs" viewBox="0 0 38 26" aria-hidden="true"><path class="rd" d="M0 19h8l5-6h12l5 6h8v7H0z"/>'+

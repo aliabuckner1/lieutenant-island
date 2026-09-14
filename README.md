@@ -1,4 +1,4 @@
-# Lieutenant Island high tides
+# Lt. Island Tides
 
 When is the road to Lieutenant Island (Wellfleet, MA) under water? Live at
 **https://aliabuckner1.github.io/lieutenant-island/** (the old ltisland.netlify.app link forwards there).
