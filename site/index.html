@@ -154,11 +154,6 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
   <p class="fresh" id="fresh"></p>
 </main>
 <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"><div class="sh" id="sheetBody"></div></dialog>
-<!-- Netlify reads this at deploy time to learn the report form's fields; the visible form is built in JavaScript -->
-<form name="road-report" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="report_id"><input name="seen_at"><input name="level"><input name="edge"><input name="depth_in">
-  <input name="depth_how"><input name="observer"><input name="forecast_in"><input name="high_tide"><input name="reported_at">
-</form>
 <script src="tide-data.js"></script>
 <script>
 (function(){
@@ -338,14 +333,16 @@ var EDGES={rising:"only just coming over",falling:"only just gone off"};
 function wallInput(ms){var d=new Date(ms);function p(x){return ("0"+x).slice(-2);}
   return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+"T"+p(d.getUTCHours())+":"+p(d.getUTCMinutes());}
 function loadReports(){try{return JSON.parse(localStorage.getItem(KEY)||"[]");}catch(e){return [];}}
-/* ---- sending reports to Netlify Forms (the hidden form at the bottom of the page tells Netlify which fields to keep) ---- */
-var FORM="road-report",SENDING={};
+/* ---- sending reports to a Google Sheet, through the Apps Script in apps-script/Code.gs ---- */
+var REPORT_URL="",SENDING={};  /* the Apps Script web app URL (ends in /exec); until it is set, reports stay saved on the phone */
 function sendReport(r){
-  var fields={"form-name":FORM,"bot-field":"",report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
+  var fields={report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
     depth_in:r.depth_in==null?"":String(r.depth_in),depth_how:r.depth_in==null?"":(r.depth_measured?"measured":"estimate"),
     observer:r.observer||"",forecast_in:r.forecast_in==null?"":String(r.forecast_in),high_tide:r.high_tide||"",reported_at:r.reported_at};
-  return fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fields).toString()})
-    .then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);});
+  if(!REPORT_URL)return Promise.reject(new Error("no report address set yet"));
+  return fetch(REPORT_URL,{method:"POST",body:new URLSearchParams(fields)})
+    .then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);return res.json();})
+    .then(function(j){if(!j||!j.ok)throw new Error((j&&j.error)||"not saved");});
 }
 function markSent(id){
   var all=loadReports();all.forEach(function(r){if(r.id===id)r.sent=true;});
