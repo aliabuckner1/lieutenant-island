@@ -270,12 +270,15 @@ function highsHTML(M,k,n){
 function partOfDay(ms){var x=D(ms).getUTCHours();
   return x<5?"overnight":x<12?"morning":x<17?"afternoon":x<21?"evening":"night";}
 /* a quiet one-line "right now" — planning ahead is the main job, so this stays small */
+/* right now as a badge (a check when clear, waves when under water), so it doesn't look like the depth colours */
+var CHECK_IC='<svg class="ic" style="color:var(--clear)" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>';
+function wavesIc(color){return '<svg class="ic" style="color:'+color+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 15c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>';}
 function statusLineHTML(M){
   var s=statusNow(M),n=s.now;
-  if(!s.wet)return '<i class="dot" style="background:var(--clear)"></i><span><b>Clear right now</b>'+
-    (s.change?" · next closure "+whenTxt(s.change,n):" · no closures this week")+"</span>";
-  return '<i class="dot" style="background:'+s.state.color+'"></i><span><b>Under water right now</b>'+
-    (s.change?" · reopens "+whenTxt(s.change,n):"")+"</span>";
+  if(!s.wet)return '<span class="badge" style="background:var(--clear-bg)">'+CHECK_IC+'Clear right now</span>'+
+    '<span>'+(s.change?"next closure "+whenTxt(s.change,n):"no closures this week")+"</span>";
+  return '<span class="badge" style="background:var(--'+s.state.cls+'-bg)">'+wavesIc(s.state.color)+'Under water right now</span>'+
+    (s.change?"<span>reopens "+whenTxt(s.change,n)+"</span>":"");
 }
 function freshHTML(M,note){
   var bits=["Live · updated "+fmtT(M.now)];
