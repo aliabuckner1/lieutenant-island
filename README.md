@@ -1,6 +1,6 @@
-# Lieutenant Island causeway crossing
+# Lieutenant Island high tides
 
-When is the causeway road to Lieutenant Island (Wellfleet, MA) under water? Live at
+When is the road to Lieutenant Island (Wellfleet, MA) under water? Live at
 **https://aliabuckner1.github.io/lieutenant-island/** (the old ltisland.netlify.app link forwards there).
 
 The page runs entirely in the browser. On every load it fetches NOAA tide predictions, the live Boston tide gauge,
