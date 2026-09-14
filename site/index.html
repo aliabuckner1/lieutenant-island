@@ -334,7 +334,7 @@ function wallInput(ms){var d=new Date(ms);function p(x){return ("0"+x).slice(-2)
   return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+"T"+p(d.getUTCHours())+":"+p(d.getUTCMinutes());}
 function loadReports(){try{return JSON.parse(localStorage.getItem(KEY)||"[]");}catch(e){return [];}}
 /* ---- sending reports to a Google Sheet, through the Apps Script in apps-script/Code.gs ---- */
-var REPORT_URL="",SENDING={};  /* the Apps Script web app URL (ends in /exec); until it is set, reports stay saved on the phone */
+var REPORT_URL="https://script.google.com/macros/s/AKfycbyjioRqCrvPjDhjX7qbR1PfiyJA3EIxmYb5wV5JTyw1-gM7LtF7X_gOupBV_AWTsOmR/exec",SENDING={};  /* the Apps Script web app URL (ends in /exec); until it is set, reports stay saved on the phone */
 function sendReport(r){
   var fields={report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
     depth_in:r.depth_in==null?"":String(r.depth_in),depth_how:r.depth_in==null?"":(r.depth_measured?"measured":"estimate"),
