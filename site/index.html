@@ -281,17 +281,19 @@ function capTxt(E){
 function whyRow(lab,note,ft){
   return '<div class="why"><div><b>'+lab+'</b><small>'+note+'</small></div><span class="'+amtCls(ft)+'">'+inTxt(ft)+'</span></div>';
 }
-function windTxt(E){return E.wind<3?"calm":compass(E.dir)+" "+Math.round(E.wind)+" kt";}
+/* non-breaking spaces keep a reading like "W 5 kt" on one line */
+function windTxt(E){return E.wind<3?"calm":compass(E.dir)+"\u00a0"+Math.round(E.wind)+"\u00a0kt";}
 function partsHTML(E){
   var by={};E.parts.forEach(function(p){by[p.k]=p.ft;});
-  var gauge=by.gauge==null?"":whyRow("Live tide gauge",
+  /* a few days out the gauge barely counts; skip its line once it rounds to 0 in */
+  var gauge=by.gauge==null||Math.round(by.gauge*12)===0?"":whyRow("Live tide gauge",
     "How high the water is running at the gauge right now"+(E.gaugeAt?" (as of "+T.fmtT(E.gaugeAt)+")":""),by.gauge);
   if(by.typical!=null)return gauge+whyRow("Typical amount","What sea level, wind and pressure add on an average day",by.typical);
   /* next to the gauge, the weather pieces share one line so none of them looks misleadingly small */
   if(gauge)return gauge+whyRow("Wind and pressure forecast",
-    "Sea level above the charts, "+Math.round(E.mb)+" mb pressure, "+windTxt(E)+" wind",by.base+by.pressure+by.wind);
+    "Sea level above the charts, "+Math.round(E.mb)+"\u00a0mb pressure, "+windTxt(E)+"\u00a0wind",by.base+by.pressure+by.wind);
   return whyRow("Sea level above the charts","NOAA’s charts still use 1983–2001 sea level, so this is added to every tide",by.base)+
-    whyRow("Air pressure",Math.round(E.mb)+" mb · "+effect(by.pressure),by.pressure)+
+    whyRow("Air pressure",Math.round(E.mb)+"\u00a0mb · "+effect(by.pressure),by.pressure)+
     whyRow("Wind",windTxt(E).replace(/^c/,"C")+" · "+effect(by.wind),by.wind);
 }
 function openDetail(it){
