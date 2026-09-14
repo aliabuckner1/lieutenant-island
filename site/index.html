@@ -124,7 +124,9 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
 /* tapping an option twice quickly shouldn't select its text */
 .choice,.check,.seg label{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .formerr{color:var(--shut-ink);font-size:13.5px;margin-top:10px}
-.preview{font-family:var(--mono);font-size:11px;color:var(--warn-ink);margin:12px 0 0;text-align:center}
+.sendstate{font-family:var(--mono);font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.sendstate.ok{color:var(--clear-ink)}
+.sendstate.wait{color:var(--warn-ink)}
 .thanks p{font-size:15px;margin:12px 0 0;color:var(--ink-2)}
 .thanks b{color:var(--ink)}
 .mine{margin-top:18px}
@@ -152,6 +154,11 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
   <p class="fresh" id="fresh"></p>
 </main>
 <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"><div class="sh" id="sheetBody"></div></dialog>
+<!-- Netlify reads this at deploy time to learn the report form's fields; the visible form is built in JavaScript -->
+<form name="road-report" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="report_id"><input name="seen_at"><input name="level"><input name="edge"><input name="depth_in">
+  <input name="depth_how"><input name="observer"><input name="forecast_in"><input name="high_tide"><input name="reported_at">
+</form>
 <script src="tide-data.js"></script>
 <script>
 (function(){
@@ -331,6 +338,35 @@ var EDGES={rising:"only just coming over",falling:"only just gone off"};
 function wallInput(ms){var d=new Date(ms);function p(x){return ("0"+x).slice(-2);}
   return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+"T"+p(d.getUTCHours())+":"+p(d.getUTCMinutes());}
 function loadReports(){try{return JSON.parse(localStorage.getItem(KEY)||"[]");}catch(e){return [];}}
+/* ---- sending reports to Netlify Forms (the hidden form at the bottom of the page tells Netlify which fields to keep) ---- */
+var FORM="road-report",SENDING={};
+function sendReport(r){
+  var fields={"form-name":FORM,"bot-field":"",report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
+    depth_in:r.depth_in==null?"":String(r.depth_in),depth_how:r.depth_in==null?"":(r.depth_measured?"measured":"estimate"),
+    observer:r.observer||"",forecast_in:r.forecast_in==null?"":String(r.forecast_in),high_tide:r.high_tide||"",reported_at:r.reported_at};
+  return fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fields).toString()})
+    .then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);});
+}
+function markSent(id){
+  var all=loadReports();all.forEach(function(r){if(r.id===id)r.sent=true;});
+  try{localStorage.setItem(KEY,JSON.stringify(all));}catch(e){}
+}
+/* one attempt at a time per report, so a retry can't send it twice */
+function sendOne(r){
+  if(!SENDING[r.id])SENDING[r.id]=sendReport(r).then(function(){markSent(r.id);},function(e){delete SENDING[r.id];throw e;});
+  return SENDING[r.id];
+}
+/* reports that didn't go out (no signal, or the send failed) are retried whenever the page has a connection */
+function flushReports(){
+  loadReports().forEach(function(r){if(r.sent===false)sendOne(r).catch(function(e){console.warn("report not sent yet:",e.message);});});
+}
+function sendState(ok,id){
+  var s=el("sendState"),u=id&&document.querySelector('[data-unsent="'+id+'"]');
+  if(u)u.remove();
+  if(!s)return;
+  s.className="sendstate "+(ok?"ok":"wait");
+  s.textContent=ok?"Report sent.":"Not sent yet. It’s saved on this phone and will send the next time you open this page with signal.";
+}
 function inchTxt(d){return (Math.round(d*2)/2)+" in";}
 /* a little cross-section of the causeway with the water at three heights */
 function choice(v,title,sub,waterY){
@@ -357,8 +393,7 @@ function openReport(ctx){
     '<label class="field"><span>When</span><input class="inp" type="datetime-local" name="seen_at" value="'+wallInput(n)+'" max="'+wallInput(n)+'"></label>'+
     '<label class="field"><span>Your first name <em>optional</em></span><input class="inp" type="text" name="observer" maxlength="40" autocomplete="given-name" value="'+esc(name)+'"></label>'+
     '<div class="formerr" id="rferr" role="alert" hidden></div>'+
-    '<button class="btn primary wide" type="submit" disabled>Save report</button></form>'+
-    '<p class="preview">Preview — reports are saved on this phone only, not sent anywhere yet.</p>');
+    '<button class="btn primary wide" type="submit" disabled>Send report</button></form>');
   var f=el("rf");
   f.addEventListener("change",function(e){
     var lvl=f.level.value;
@@ -379,13 +414,14 @@ function saveReport(f,ctx){
   if(isNaN(ms))return fail("Pick when you saw it.");
   if(ms>n+5*T.MIN)return fail("That time hasn’t happened yet.");
   var fc=ms>=S[0].ms&&ms<=S[S.length-1].ms?T.interp(S,ms):null,name=f.observer.value.trim();
-  var rec={seen_at:v,level:f.level.value,depth_in:depth,depth_measured:depth==null?null:f.depth_how.value==="measured",
+  var rec={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),sent:false,seen_at:v,level:f.level.value,depth_in:depth,depth_measured:depth==null?null:f.depth_how.value==="measured",
     edge:f.edge.checked?(wet?"rising":"falling"):null,observer:name||null,
     forecast_in:fc?Math.round(fc.inch*10)/10:null,high_tide:ctx&&ctx.h?wallInput(ctx.h.ms):null,
     reported_at:new Date().toISOString()};
   var all=loadReports();all.push(rec);
   try{localStorage.setItem(KEY,JSON.stringify(all));if(name)localStorage.setItem("li-name",name);}catch(e){}
   showThanks(rec,fc,all);
+  sendOne(rec).then(function(){sendState(true,rec.id);},function(){sendState(false);});
 }
 /* how a report compares with what the forecast had at that moment */
 function compareTxt(rec,fc){
@@ -407,13 +443,14 @@ function showThanks(rec,fc,all){
   var mine=all.slice(-5).reverse().map(function(r){var t=T.parseWall(r.seen_at);
     return '<div><b>'+T.dayName(T.dayStart(t),n)+' '+T.fmtT(t)+'</b> · '+LEVELS[r.level]+
       (r.depth_in!=null?", "+inchTxt(r.depth_in)+(r.depth_measured?" measured":" est."):"")+
-      (r.edge?", "+EDGES[r.edge]:"")+(r.observer?" · "+esc(r.observer):"")+'</div>';}).join("");
-  show(headHTML("Report saved","Thanks"+(rec.observer?", "+esc(rec.observer):"")+"!")+'<div class="thanks">'+msg+'</div>'+
+      (r.edge?", "+EDGES[r.edge]:"")+(r.observer?" · "+esc(r.observer):"")+(r.sent===false?'<span data-unsent="'+r.id+'"> · not sent yet</span>':"")+'</div>';}).join("");
+  show(headHTML("Road report","Thanks"+(rec.observer?", "+esc(rec.observer):"")+"!")+'<p class="sendstate" id="sendState">Sending…</p><div class="thanks">'+msg+'</div>'+
     '<div class="mine"><div class="kicker">On this phone · '+all.length+' report'+(all.length===1?"":"s")+'</div>'+mine+'</div>'+
-    '<button class="btn primary wide" type="button" data-act="close">Done</button>'+
-    '<p class="preview">Preview — not sent anywhere yet.</p>');
+    '<button class="btn primary wide" type="button" data-act="close">Done</button>');
 }
 
+flushReports();
+window.addEventListener("online",flushReports);
 T.run({render:render,
   tick:function(M){el("status").innerHTML=T.statusLineHTML(M);},
   error:function(err,M){
