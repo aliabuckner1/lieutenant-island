@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Icon and link preview, before publishing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1200px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:78ch;margin:8px 0 0;font-size:15px}
+section{margin-top:30px}
+section h2{font-family:var(--display);font-size:20px;margin:0 0 4px}
+section p{margin:0 0 14px;font-size:14px;color:var(--ink-2)}
+.row{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-end}
+.big img{width:256px;height:256px;border-radius:56px;box-shadow:var(--shadow);display:block}
+.cap{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.06em}
+/* a slice of an iPhone home screen at real size */
+.home{width:360px;padding:22px 18px 26px;border-radius:30px;background:linear-gradient(160deg,#3b5a78,#7d6a8f 55%,#c48f7a);display:grid;grid-template-columns:repeat(4,60px);gap:22px 25px;justify-content:center}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px}
+.app i,.app img{width:60px;height:60px;border-radius:14px;display:block}
+.app span{font-family:-apple-system,"Public Sans",sans-serif;font-size:11px;color:#fff;text-shadow:0 1px 2px #0006;white-space:nowrap}
+/* a browser tab with the favicon */
+.tab{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--rule);border-radius:10px 10px 0 0;padding:8px 14px;font-size:13px;color:#333;min-width:220px}
+.tab img{width:16px;height:16px}
+/* a text-message link preview */
+.bubble{width:300px;border-radius:18px;overflow:hidden;background:#e9e9eb;font-family:-apple-system,"Public Sans",sans-serif}
+.bubble img{width:100%;display:block}
+.bubble div{padding:8px 12px 10px}
+.bubble b{display:block;font-size:13px;color:#111}
+.bubble small{font-size:12px;color:#8a8a8e}
+.card img{width:600px;border-radius:12px;box-shadow:var(--shadow);display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · before publishing</div>
+  <h1>Icon and link preview</h1>
+  <p class="lede">These are the exact image files that would be published, shown the way people would see them. Nothing here is live yet.</p>
+
+  <section>
+    <h2>The icon</h2>
+    <p>A sandy road with the tide coming over it. iPhones round the corners automatically.</p>
+    <div class="row">
+      <div class="big"><img src="../site/icon-512.png" alt="Icon"><div class="cap">large</div></div>
+      <div>
+        <div class="home">
+          <div class="app"><i style="background:#34c759"></i><span>Messages</span></div>
+          <div class="app"><i style="background:#fff"></i><span>Photos</span></div>
+          <div class="app"><img src="../site/apple-touch-icon.png" alt=""><span>Island Tides</span></div>
+          <div class="app"><i style="background:#0a84ff"></i><span>Weather</span></div>
+        </div>
+        <div class="cap">on a home screen, at real size</div>
+      </div>
+      <div><div class="tab"><img src="../site/favicon-32.png" alt="">Lt. Island Tides</div><div class="cap">in a browser tab</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The link preview</h2>
+    <p>What a texted or shared link would show. It has no live status, so it never goes out of date.</p>
+    <div class="row">
+      <div class="bubble"><img src="../site/og-image.png" alt="Link preview"><div><b>Lt. Island Tides</b><small>aliabuckner1.github.io</small></div></div>
+      <div class="card"><img src="../site/og-image.png" alt="Link preview, full size"><div class="cap">full size (1200 × 630)</div></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

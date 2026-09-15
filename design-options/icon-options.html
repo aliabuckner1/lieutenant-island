@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Icon options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1500px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:80ch;margin:8px 0 0;font-size:15px}
+.opt{display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:center;margin-top:26px;padding:22px;background:var(--surface);border:1px solid var(--rule);border-radius:18px}
+.opt .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.opt b.name{display:block;font-family:var(--display);font-size:20px;margin-top:2px}
+.opt p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2);max-width:62ch}
+.big svg{width:200px;height:200px;border-radius:45px;display:block;box-shadow:var(--shadow)}
+.uses{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;margin-top:16px}
+.cap{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:7px;letter-spacing:.05em}
+/* home screen at real size */
+.home{padding:16px 16px 18px;border-radius:24px;background:linear-gradient(160deg,#3b5a78,#7d6a8f 55%,#c48f7a);display:grid;grid-template-columns:repeat(3,60px);gap:18px 22px}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px}
+.app i,.app svg{width:60px;height:60px;border-radius:13.5px;display:block}
+.app span{font-family:-apple-system,"Public Sans",sans-serif;font-size:11px;color:#fff;text-shadow:0 1px 2px #0006;white-space:nowrap}
+/* browser tab */
+.tab{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--rule);border-radius:10px 10px 0 0;padding:8px 14px;font-size:13px;color:#333}
+.tab svg{width:16px;height:16px;border-radius:3px}
+/* link preview card */
+.card{width:340px;height:178px;border-radius:12px;background:#E9EFF1;display:flex;align-items:center;gap:18px;padding:0 24px;box-sizing:border-box;border:1px solid var(--rule)}
+.card svg{width:84px;height:84px;border-radius:19px;flex:none;box-shadow:0 4px 12px #0f20271f}
+.card .e{font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.14em;color:#63808B;text-transform:uppercase}
+.card .t{font-family:var(--display);font-size:25px;font-weight:700;color:#0F2027;line-height:1.1;margin-top:3px;white-space:nowrap}
+.card .s{font-size:12px;color:#33505B;margin-top:5px;line-height:1.3}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Icon options</h1>
+  <p class="lede">Four new directions drawn from Alia's photos of the road and bridge, with today's icon for comparison. Each is shown large, on a
+    phone home screen, as a browser-tab icon, and in the link-preview card. Nothing here is published.</p>
+  <div id="list"></div>
+</div>
+<script>
+(function(){
+"use strict";
+var n=0;
+/* each drawing takes a unique suffix so its gradients don't clash when it appears several times on the page */
+function wrap(inner){return '<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+inner+'</svg>';}
+function wave(y){return 'M-20 '+y+'c34 0 34-30 68-30s34 30 68 30 34-30 68-30 34 30 68 30 34-30 68-30 34 30 68 30 34-30 68-30 34 30 68 30 34-30 68-30 34 30 68 30';}
+
+var ART={
+  current:function(u){return wrap(
+    '<defs><linearGradient id="sea'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1690A0"/><stop offset="1" stop-color="#0B6E7A"/></linearGradient>'+
+    '<clipPath id="rt'+u+'"><rect width="512" height="362"/></clipPath></defs>'+
+    '<rect width="512" height="512" fill="url(#sea'+u+')"/>'+
+    '<path d="'+wave(190)+'" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="18" stroke-linecap="round"/>'+
+    '<rect y="326" width="512" height="76" fill="#F1E6CC"/><path d="M0 382H512" stroke="#CDB98F" stroke-width="7" stroke-dasharray="40 28"/>'+
+    '<path d="'+wave(296)+'V362H-20Z" fill="#4FB3C8" fill-opacity=".72" clip-path="url(#rt'+u+')"/>'+
+    '<path d="'+wave(296)+'" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>');},
+
+  road:function(u){return wrap(
+    '<defs><linearGradient id="sk'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FA6D2"/><stop offset="1" stop-color="#E7E5EF"/></linearGradient>'+
+    '<linearGradient id="ma'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A3B75E"/><stop offset="1" stop-color="#6B8733"/></linearGradient>'+
+    '<linearGradient id="wa'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D3DEEA"/><stop offset="1" stop-color="#8EA8C6"/></linearGradient></defs>'+
+    '<rect width="512" height="512" fill="url(#sk'+u+')"/>'+
+    '<path d="M70 150c22-30 74-34 100-10 24-20 70-16 88 12 34-4 58 14 58 34H70z" fill="#fff" fill-opacity=".5"/>'+
+    '<path d="M0 268c24-16 58-20 90-14 30-18 76-18 108-4 36-12 74-8 104 6 22-4 44-2 62 12H0z" fill="#2E4A37"/>'+
+    '<rect y="266" width="512" height="246" fill="url(#ma'+u+')"/>'+
+    '<path d="M246 266h20l156 246H90z" fill="#8B8E92"/>'+
+    '<path d="M168 356H344L470 512H42Z" fill="url(#wa'+u+')"/>'+
+    '<path d="M70 486h110M318 474h130M98 452h56" stroke="#fff" stroke-opacity=".7" stroke-width="9" stroke-linecap="round"/>');},
+
+  bridge:function(u){
+    function chevrons(x,dir){var s='';for(var i=0;i<3;i++){var cx=x+i*34;
+      s+=dir>0?'<path d="M'+cx+' 268l20 18-20 18h15l20-18-20-18z" fill="#1B1B1B"/>':'<path d="M'+(cx+20)+' 268l-20 18 20 18h15l-20-18 20-18z" fill="#1B1B1B"/>';}return s;}
+    return wrap(
+    '<defs><linearGradient id="sy'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D62B3"/><stop offset="1" stop-color="#A7C9EC"/></linearGradient>'+
+    '<linearGradient id="wt'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E90C4"/><stop offset="1" stop-color="#1A416D"/></linearGradient></defs>'+
+    '<rect width="512" height="512" fill="url(#sy'+u+')"/>'+
+    '<circle cx="372" cy="132" r="70" fill="#FFF6D8" fill-opacity=".22"/><circle cx="372" cy="132" r="30" fill="#FFF6D8"/>'+
+    '<path d="M40 292c34-14 96-16 150-6 44-10 92-8 124 6H40z" fill="#1D3246"/>'+
+    '<rect y="290" width="512" height="222" fill="url(#wt'+u+')"/>'+
+    '<path d="M228 300h56l96 212H132z" fill="#3A4652"/>'+
+    '<path d="M112 428H400L436 512H76Z" fill="#79A9D6" fill-opacity=".55"/>'+
+    '<rect x="158" y="246" width="14" height="164" fill="#23292E"/><rect x="340" y="246" width="14" height="164" fill="#23292E"/>'+
+    '<rect x="84" y="262" width="126" height="48" rx="5" fill="#F2C230"/>'+chevrons(96,1)+
+    '<rect x="302" y="262" width="126" height="48" rx="5" fill="#F2C230"/>'+chevrons(314,-1)+
+    '<path d="M40 470h90M372 486h100M56 448h40M420 454h50" stroke="#fff" stroke-opacity=".7" stroke-width="8" stroke-linecap="round"/>');},
+
+  dusk:function(u){return wrap(
+    '<defs><linearGradient id="dk'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C82D8"/><stop offset=".6" stop-color="#AFB4DE"/><stop offset="1" stop-color="#F0D0BC"/></linearGradient>'+
+    '<linearGradient id="dw'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7CFC3"/><stop offset=".4" stop-color="#A7AED6"/><stop offset="1" stop-color="#2E4676"/></linearGradient></defs>'+
+    '<rect width="512" height="306" fill="url(#dk'+u+')"/>'+
+    '<path d="M50 150c90-24 230-26 380-8M120 206c70-12 180-14 300-2" stroke="#fff" stroke-opacity=".35" stroke-width="10" stroke-linecap="round" fill="none"/>'+
+    '<rect y="306" width="512" height="206" fill="url(#dw'+u+')"/>'+
+    '<path d="M0 300h512v12c-70 5-140-1-210 3s-160 5-230 0c-30-2-52-1-72 1z" fill="#4A5838"/>'+
+    '<path d="M60 392c14-34 36-54 80-54 36 0 60 24 72 54z" fill="#7F8A42"/><path d="M60 392c14 22 36 34 80 34 36 0 60-14 72-34z" fill="#7F8A42" fill-opacity=".32"/>'+
+    '<path d="M318 364c10-22 24-34 48-34 22 0 38 14 46 34z" fill="#7F8A42"/><path d="M318 364c10 14 24 22 48 22 22 0 38-8 46-22z" fill="#7F8A42" fill-opacity=".32"/>'+
+    '<path d="M0 452H512" stroke="#F1E6CC" stroke-width="13" stroke-dasharray="120 34" stroke-opacity=".85"/>');},
+
+  chevron:function(u){return wrap(
+    '<defs><linearGradient id="cs'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1690A0"/><stop offset="1" stop-color="#0B5E6B"/></linearGradient></defs>'+
+    '<rect width="512" height="512" fill="url(#cs'+u+')"/>'+
+    '<rect x="244" y="236" width="24" height="150" fill="#1E2A30"/>'+
+    '<rect x="96" y="128" width="320" height="120" rx="22" fill="#F2C230"/>'+
+    '<path d="M150 148l52 40-52 40h40l52-40-52-40zM236 148l52 40-52 40h40l52-40-52-40z" fill="#16191B"/>'+
+    '<path d="'+wave(356)+'V512H-20Z" fill="#4FB3C8" fill-opacity=".6"/>'+
+    '<path d="'+wave(356)+'" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>'+
+    '<path d="'+wave(446)+'" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="16" stroke-linecap="round"/>');}
+};
+
+var OPTIONS=[
+  {id:'0',key:'current',name:'Today’s icon',about:'For comparison: the sandy road with the tide coming over it.'},
+  {id:'1',key:'road',name:'Road into the water',about:'From the flooded-road photo: the road running toward the island between green marsh, with the tide over its near end.'},
+  {id:'2',key:'bridge',name:'The bridge',about:'From the bridge photos: the chevron signs and posts, the deck running into the water, and a low sun. The most recognisably “our bridge”.'},
+  {id:'3',key:'dusk',name:'Marsh at dusk',about:'From the marsh photos: pastel sky, still water, grass clumps with their reflections, and a faint broken road line across the water. The calmest and prettiest.'},
+  {id:'4',key:'chevron',name:'Chevron sign',about:'A bold, simple mark: the bridge’s yellow chevron sign rising out of the tide. The easiest to spot at small sizes.'}
+];
+document.getElementById('list').innerHTML=OPTIONS.map(function(o){
+  var a=ART[o.key];
+  return '<div class="opt"><div class="big">'+a('b'+(n++))+'</div><div>'+
+    '<div class="id">Option '+o.id+'</div><b class="name">'+o.name+'</b><p>'+o.about+'</p>'+
+    '<div class="uses">'+
+      '<div><div class="home"><div class="app"><i style="background:#34c759"></i><span>Messages</span></div>'+
+        '<div class="app">'+a('h'+(n++))+'<span>Island Tides</span></div><div class="app"><i style="background:#0a84ff"></i><span>Weather</span></div></div>'+
+        '<div class="cap">home screen, real size</div></div>'+
+      '<div><div class="tab">'+a('t'+(n++))+'Lt. Island Tides</div><div class="cap">browser tab</div></div>'+
+      '<div><div class="card">'+a('c'+(n++))+'<div><div class="e">Wellfleet · Cape Cod</div><div class="t">Lt. Island Tides</div>'+
+        '<div class="s">When the road is under water, for the next 8 days</div></div></div><div class="cap">link preview</div></div>'+
+    '</div></div></div>';
+}).join('');
+})();
+</script>
+</body>
+</html>

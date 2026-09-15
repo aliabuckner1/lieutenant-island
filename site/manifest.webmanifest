@@ -1,0 +1,15 @@
+{
+  "name": "Lt. Island Tides",
+  "short_name": "Island Tides",
+  "description": "When the road to Lieutenant Island in Wellfleet is under water, for the next 8 days.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E9EFF1",
+  "theme_color": "#0B6E7A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

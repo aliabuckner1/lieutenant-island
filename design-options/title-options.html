@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Title options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1500px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:78ch;margin:8px 0 0;font-size:15px}
+.grid{display:flex;flex-wrap:wrap;gap:24px;margin-top:22px}
+figure{margin:0;width:390px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:40px}
+.phone{background:var(--ground);border:1px solid var(--rule);border-radius:26px;padding:22px 16px 20px;box-shadow:var(--shadow)}
+.phone h2{font-family:var(--display);font-size:24px;line-height:1.15;margin:3px 0 0;font-weight:700;letter-spacing:-.01em}
+.sub{font-size:14.5px;color:var(--ink-2);margin-top:3px;line-height:1.35}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Title and top line</h1>
+  <p class="lede">The small grey line above the title is all caps in a typewriter font, which suits short labels. Option D puts the
+    "what this is for" line under the title in normal text instead. Each card shows the status badge underneath for context.</p>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+(function(){
+"use strict";
+var CHECK='<svg class="ic" style="color:var(--clear)" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>';
+var badge='<div class="statusline"><span class="badge" style="background:var(--clear-bg)">'+CHECK+'Clear right now</span><span>next closure 2:24am tonight</span></div>';
+var OPTIONS=[
+  {id:'A',about:'Today: place above, "High tides" as the title.',eyebrow:'Lieutenant Island · Wellfleet',title:'High tides'},
+  {id:'B',about:'Place plus purpose above; the title matches ltislandtides.com.',eyebrow:'Wellfleet · Road crossing',title:'Lt. Island tides'},
+  {id:'C',about:'Says what it’s for in three words.',eyebrow:'When the road floods',title:'Lt. Island tides'},
+  {id:'D',about:'Place above; a plain-English line under the title says what it’s for.',eyebrow:'Wellfleet',title:'Lt. Island tides',sub:'When the road is under water, for the next 8 days'},
+  {id:'E',about:'A question, answered by the badge right below it.',eyebrow:'Can you get across?',title:'Lt. Island tides'},
+  {id:'F',about:'What the list below is.',eyebrow:'Road closures · next 8 days',title:'Lt. Island tides'}
+];
+document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
+  return '<figure><figcaption><div class="id">Option '+o.id+'</div><p>'+o.about+'</p></figcaption>'+
+    '<div class="phone"><div class="brand">'+o.eyebrow+'</div><h2>'+o.title+'</h2>'+(o.sub?'<div class="sub">'+o.sub+'</div>':'')+badge+'</div></figure>';
+}).join('');
+})();
+</script>
+</body>
+</html>
