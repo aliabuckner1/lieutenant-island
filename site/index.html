@@ -49,7 +49,8 @@
 
 /* ---- tap a tide for details ---- */
 .actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
-.hint{font-size:12.5px;color:var(--muted)}
+.actions .btn{width:100%;justify-content:center;padding:10px 14px}
+.top h1{font-size:30px;line-height:1.12;letter-spacing:-.012em}
 .btn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);
   border-radius:99px;padding:7px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn .ic{width:15px;height:15px}
@@ -152,7 +153,6 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
   <p class="sub">When the road is under water, for the next 8&nbsp;days</p>
   <div class="statusline" id="status" hidden></div>
   <div class="actions" id="actions" hidden>
-    <span class="hint">Tap a tide for details</span>
     <button class="btn" id="reportBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Report the road</button>
   </div>
   <div class="loading" id="loading">Checking the tide…</div>
