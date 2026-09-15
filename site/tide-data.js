@@ -131,10 +131,21 @@ function build(r,now){
   /* the last hour with both wind and pressure, so tides past the end of the forecast can say so */
   function lastKey(o){var k=Object.keys(o);return k.length?Math.max.apply(null,k):-Infinity;}
   var wxEnd=Math.min(lastKey(ws),lastKey(wd),lastKey(mb));
-  function surgeAt(ms){var h=hourKey(ms),s=ws[h],d=wd[h],p=mb[h];
-    if(s==null||d==null||p==null)return null;
-    var u=-s*Math.sin(d*Math.PI/180),v=-s*Math.cos(d*Math.PI/180);
-    return C[0]+C[1]*(p-1015)+C[2]*u+C[3]*v+C[4]*s*v+C[5]*(D(ms).getUTCFullYear()-2020);}
+  /* the model was fitted on the weather leading up to high tide: pressure averaged over the 6 hours up to it, wind over
+     the 9 hours up to it. Averaging the forecast the same way beat using the single hour at every range 0–7 days ahead
+     (scripts/backtest_weather_window.py). Hours before the forecast starts are skipped. */
+  var P_HOURS=6,W_HOURS=9;
+  function wxAt(ms){var h=hourKey(ms);
+    if(ws[h]==null||wd[h]==null||mb[h]==null)return null;
+    var p=0,np=0,u=0,v=0,s=0,nw=0;
+    for(var k=0;k<W_HOURS;k++){var sk=ws[h-k],dk=wd[h-k];
+      if(k<P_HOURS&&mb[h-k]!=null){p+=mb[h-k];np++;}
+      if(sk!=null&&dk!=null){u-=sk*Math.sin(dk*Math.PI/180);v-=sk*Math.cos(dk*Math.PI/180);s+=sk;nw++;}}
+    u/=nw;v/=nw;s/=nw;
+    return {p:p/np,u:u,v:v,s:s,dir:(Math.atan2(-u,-v)*180/Math.PI+360)%360};}
+  function surgeAt(ms){var w=wxAt(ms);
+    if(!w)return null;
+    return C[0]+C[1]*(w.p-1015)+C[2]*w.u+C[3]*w.v+C[4]*w.s*w.v+C[5]*(D(ms).getUTCFullYear()-2020);}
 
   /* 4. blend: the live gauge's share of the surge (g) starts at 70% now and slides to nothing 3 days out; the rest
      comes from the weather model, or a typical amount for hours the forecast doesn't cover. Chosen by replaying
@@ -146,14 +157,15 @@ function build(r,now){
   }
   /* what's behind the surge at one moment, split into pieces (feet at Wellfleet) that add up to it */
   function explain(ms){
-    var b=blendAt(ms),h=hourKey(ms),s=ws[h],d=wd[h],p=mb[h],g=b.g,m=(1-g)*RATIO,parts=[];
+    var b=blendAt(ms),h=hourKey(ms),w=wxAt(ms),g=b.g,m=(1-g)*RATIO,parts=[];
     if(g>0)parts.push({k:"gauge",ft:g*live*RATIO});
     if(b.mod==null)parts.push({k:"typical",ft:m*TYP});
-    else{var u=-s*Math.sin(d*Math.PI/180),v=-s*Math.cos(d*Math.PI/180);
+    else{
       parts.push({k:"base",ft:m*(C[0]+C[5]*(D(ms).getUTCFullYear()-2020))});
-      parts.push({k:"pressure",ft:m*C[1]*(p-1015)});
-      parts.push({k:"wind",ft:m*(C[2]*u+C[3]*v+C[4]*s*v)});}
-    return {ms:ms,surge:b.res*RATIO,g:g,model:b.mod!=null,beyond:isFinite(wxEnd)&&h>wxEnd,parts:parts,wind:s,dir:d,mb:p,
+      parts.push({k:"pressure",ft:m*C[1]*(w.p-1015)});
+      parts.push({k:"wind",ft:m*(C[2]*w.u+C[3]*w.v+C[4]*w.s*w.v)});}
+    return {ms:ms,surge:b.res*RATIO,g:g,model:b.mod!=null,beyond:isFinite(wxEnd)&&h>wxEnd,parts:parts,
+      wind:w?w.s:null,dir:w?w.dir:null,mb:w?w.p:null,
       liveFt:live==null?null:live*RATIO,gaugeAt:gaugeAt};
   }
   var series=[];

@@ -1,0 +1,18 @@
+911 Boston high tides, 2024-01-01 to 2026-07-31
+ways: tide hour = the forecast for the hour of high tide (the site now); 3h/3h = pressure and wind averaged over the
+      3 hours up to it; 6h/9h = pressure over 6 hours and wind over 9 hours up to it (how the model was fitted)
+
+1. FORECAST WEATHER, BY DAYS AHEAD (weather model only, no live gauge)
+days     n   RMSE all tides, in: tide hour      3h/3h      6h/9h     n  big surges (>12 in): tide hour      3h/3h      6h/9h     n  % flood calls wrong: tide hour      3h/3h      6h/9h
+   0   911                            3.92       3.88       3.86   148                            6.55       6.48       6.41   527                            14.6       13.9       13.9
+   1   893                            3.81       3.74       3.74   138                            6.18       6.02       6.07   519                            14.6       14.8       15.0
+   2   892                            3.94       3.93       3.92   138                            6.03       6.01       5.98   518                            15.3       15.4       15.3
+   3   891                            4.00       4.02       3.96   138                            6.16       6.13       6.07   517                            16.4       17.0       16.4
+   4   890                            4.23       4.21       4.15   138                            6.75       6.63       6.50   516                            17.8       18.0       17.4
+   5   889                            4.40       4.39       4.32   138                            7.09       7.05       6.92   515                            18.8       18.3       16.5
+   6   888                            4.73       4.62       4.55   138                            7.55       7.44       7.30   514                            19.8       19.5       19.1
+   7   887                            4.90       4.89       4.81   138                            8.13       7.95       7.73   514                            17.9       18.3       19.1
+   average RMSE over days 0-7:  tide hour 4.24  3h/3h 4.21  6h/9h 4.16
+
+2. REFERENCE: OBSERVED WEATHER (Boston pressure + buoy wind) instead of a forecast, so only the timing differs
+   n=700: RMSE  tide hour 4.23  3h/3h 4.22  6h/9h 4.14   | big surges n=119:  tide hour 6.59  3h/3h 6.58  6h/9h 6.46   | flood calls wrong n=405:  tide hour 14.3%  3h/3h 15.1%  6h/9h 15.1%
