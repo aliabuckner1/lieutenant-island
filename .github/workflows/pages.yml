@@ -23,6 +23,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+      # tag the script and stylesheet links with this commit, so a browser holding an older copy of the page
+      # can't pair it with newer files (or the new page with old ones); fails if the links ever stop matching
+      - name: Version the script and stylesheet links
+        run: |
+          v="${GITHUB_SHA::7}"
+          sed -i "s#src=\"tide-data.js\"#src=\"tide-data.js?v=$v\"#; s#href=\"base.css\"#href=\"base.css?v=$v\"#" site/index.html
+          grep -q "src=\"tide-data.js?v=$v\"" site/index.html
+          grep -q "href=\"base.css?v=$v\"" site/index.html
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
