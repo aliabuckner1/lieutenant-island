@@ -35,8 +35,8 @@ function fmtT(ms){var d=D(ms),h=d.getUTCHours(),m=d.getUTCMinutes(),ap=h<12?"am"
 function fmtD(ms,opt){var o={timeZone:"UTC"};for(var k in opt)o[k]=opt[k];return D(ms).toLocaleDateString("en-US",o);}
 function fmtDur(mins){var t=Math.round(mins),h=Math.floor(t/60),m=t%60;
   return ((h?h+"h ":"")+(m||!h?m+"m":"")).trim();}
-function depthTxt(i){return i<1?"under 1 in":Math.round(i)+" in";}
-function shortBy(n){var i=(ROAD-n.lvl)*12;return i<1?"under 1 in":Math.round(i)+" in";}
+function depthTxt(i){return i<1?"<1 in":Math.round(i)+" in";}
+function shortBy(n){var i=(ROAD-n.lvl)*12;return i<1?"<1 in":Math.round(i)+" in";}
 
 /* ---- fetching ---- */
 function getJSON(url,timeout){
