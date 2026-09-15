@@ -226,9 +226,10 @@ function render(m){
           '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span>'+CHEV+'</div>';
       }else if(it.x){
         var x=it.x;
+        /* no inches on the row: the forecast is only good to a few inches, so the number lives in the details */
         html+=rowOpen("near",it)+'<div class="tag">'+T.slotIcon(T.slotOf(x.ms))+'<div>'+T.SLOTS[T.slotOf(x.ms)].n+'</div></div>'+
           '<div><div class="when">Close call</div><div class="dur">'+(x._h?highTxt(x._h):"could still wet the road")+'</div></div>'+
-          '<span class="pill nearpill">'+T.shortBy(x)+' short</span>'+CHEV+'</div>';
+          '<span></span>'+CHEV+'</div>';
       }else{
         var hd=it.dry;
         html+=rowOpen("dry",it)+'<div class="tag">'+T.slotIcon(T.slotOf(hd.ms))+'<div>'+T.SLOTS[T.slotOf(hd.ms)].n+'</div></div>'+
