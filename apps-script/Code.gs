@@ -59,7 +59,7 @@ function emailFor_(p, sheetUrl) {
 
   var lines = [who + ' reported the road ' + (wet ? 'wet' : 'dry') + (when ? ' at ' + when.time + ' on ' + when.longDay : '') + '.', '',
     'Seen at the road:',
-    '  • ' + (wet ? 'Wet' : 'Dry') + (p.depth_in ? ', about ' + p.depth_in + ' in over the road (' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ')' : '')];
+    '  • ' + (wet ? 'Wet' : 'Dry') + (p.depth_in ? ', about ' + p.depth_in + (Number(p.depth_in) === 1 ? ' inch' : ' inches') + ' over the road (' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ')' : '')];
   if (p.edge === 'rising') lines.push('  • The water was only just coming over the road');
   if (p.edge === 'falling') lines.push('  • The water had only just gone off the road');
   if (fc != null) {
@@ -76,7 +76,7 @@ function emailFor_(p, sheetUrl) {
 function verdict_(wet, fcWet, fc, depth) {
   if (wet && fcWet && depth != null) {
     var off = depth - fc;
-    return Math.abs(off) <= 3 ? 'Close to the forecast depth' : Math.round(Math.abs(off)) + ' in ' + (off > 0 ? 'deeper' : 'shallower') + ' than the forecast';
+    return Math.abs(off) <= 3 ? 'Close to the forecast depth' : inches_(Math.abs(off)) + ' ' + (off > 0 ? 'deeper' : 'shallower') + ' than the forecast';
   }
   if (wet === fcWet) return Math.abs(fc) <= 6 ? 'Matches the forecast, with the water close to the road’s height' : 'Matches the forecast';
   if (Math.abs(fc) <= 6) return 'Different from the forecast, but close to the road’s height, so it helps pin down how high the road really is';
@@ -85,7 +85,7 @@ function verdict_(wet, fcWet, fc, depth) {
 }
 
 function inches_(x) {
-  return x < 1 ? 'under 1 in' : x >= 24 ? (x / 12).toFixed(1) + ' ft' : Math.round(x) + ' in';
+  return x < 1 ? 'under an inch' : x >= 24 ? (x / 12).toFixed(1) + ' feet' : Math.round(x) === 1 ? '1 inch' : Math.round(x) + ' inches';
 }
 
 /* "2026-09-16T12:30" (Wellfleet time, as the site sends it) → 12:30pm, 9/16/2026, Wednesday, September 16 */

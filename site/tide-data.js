@@ -286,7 +286,7 @@ function freshHTML(M,note){
   var miss=[!M.windOK&&"wind",!M.pressOK&&"pressure"].filter(Boolean).join(" and ");
   if(miss)bits.push('<span class="warn">'+miss+" forecast unavailable — typical surge assumed</span>");
   if(note)bits.push('<span class="warn">'+note+"</span>");
-  bits.push("depths are estimates (road height ±6 in) — give yourself margin");
+  bits.push("depths are estimates (road height ±6 inches) — give yourself margin");
   return bits.join(" · ");
 }
 function errorHTML(err){
