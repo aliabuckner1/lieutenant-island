@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Close call details: the same height twice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1800px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:80ch;margin:8px 0 0;font-size:15px}
+.grid{display:flex;flex-wrap:wrap;gap:26px;margin-top:22px}
+figure{margin:0;width:390px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:60px}
+.phone{background:#0b161a73;border-radius:26px;padding:70px 0 0;overflow:hidden;box-shadow:var(--shadow)}
+mark{background:#fab21955;color:inherit;border-radius:4px;padding:0 2px}
+
+/* the details sheet, copied from the live page */
+.sheet{background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;padding:6px 18px 22px}
+.grab{width:38px;height:4px;border-radius:9px;background:var(--rule);margin:4px auto 10px}
+.shhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.kicker{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sheet h2{font-family:var(--display);font-size:22px;line-height:1.2;margin:2px 0 0}
+.x{border:0;background:var(--surface-2);color:var(--ink-2);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.x .ic{width:17px;height:17px}
+.verdict{margin-top:14px;border-radius:12px;padding:11px 14px}
+.verdict b{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600}
+.verdict small{display:block;font-size:13.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.verdict.near{border:1.5px dashed var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.stat{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.stat span{display:block;font-size:11.5px;color:var(--muted)}
+.stat b{display:block;font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.roadref{margin-top:10px;font-size:13px;color:var(--muted)}
+.roadref b{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
+.sec{margin-top:22px}
+.sec h3{font-size:17px;font-weight:700;line-height:1.3;margin:0}
+.cap{font-size:12.5px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Close call details: the same height twice</h1>
+  <p class="lede">Tonight’s 2:52am close call. The forecast peak is a fraction of an inch below the road, but rounded to one decimal it shows
+    as 10.4&nbsp;ft, the same as the road, while the words say “just below”. The change is highlighted. It only applies when the forecast is
+    within an inch of the road; bigger gaps keep today’s wording (“3 inches below the road”).</p>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+(function(){
+"use strict";
+var X='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function stat(l,v,t){return '<div class="stat"><span>'+l+'</span><b>'+v+'</b><small>'+t+'</small></div>';}
+var OPTIONS=[
+  {id:'Today',name:'Today',about:'“Just below the road”, but both numbers read 10.4 ft, so it looks like a contradiction.',
+   words:'The forecast peak is just below the road at 2:54am — close enough that it could still get wet',fc:'10.4 ft'},
+  {id:'5a',name:'Say it’s right at the road',about:'The words match the numbers, and don’t claim more precision than the forecast has (it’s usually within a few inches).',
+   words:'The forecast peak is <mark>right at the road’s height</mark> at 2:54am, so it could go either way',fc:'10.4 ft'},
+  {id:'5b',name:'Two decimals when it’s this close',about:'Keeps the words and shows the gap in the number instead. Clear, but looks more exact than the forecast really is.',
+   words:'The forecast peak is just below the road at 2:54am — close enough that it could still get wet',fc:'<mark>10.37 ft</mark>'}
+];
+document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
+  return '<figure><figcaption><div class="id">'+(o.id==='Today'?'For comparison':'Option '+o.id)+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption>'+
+    '<div class="phone"><div class="sheet"><div class="grab"></div>'+
+    '<div class="shhead"><div><div class="kicker">Today · overnight</div><h2>High tide 2:52am</h2></div><button class="x" type="button" aria-label="Close">'+X+'</button></div>'+
+    '<div class="verdict near"><b>Close call</b><small>'+o.words+'</small></div>'+
+    '<div class="stats">'+stat('Tide chart','10.1 ft','2:52am')+stat('Our forecast',o.fc,'2:54am')+'</div>'+
+    '<div class="roadref">Road floods above <b>10.4 ft</b></div>'+
+    '<div class="sec"><h3>How our forecast differs from the tide chart</h3><p class="cap">This is within the next 24 hours, so it leans on what the tide gauge is measuring right now, along with the wind and pressure forecast.</p></div>'+
+    '</div></div></figure>';
+}).join('');
+})();
+</script>
+</body>
+</html>

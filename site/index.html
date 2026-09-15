@@ -32,7 +32,9 @@
 .dayhead{position:sticky;top:0;z-index:2;background:var(--ground);display:flex;justify-content:space-between;align-items:baseline;
   padding:10px 2px 6px;border-bottom:1px solid var(--rule)}
 .dayhead b{font-family:var(--display);font-size:18px;font-weight:700}
-.dayhead span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.dayhead>span{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.dayhead .ok{display:inline-flex;align-items:center;gap:5px;margin-left:9px;font-size:13px;font-weight:600;color:var(--clear-ink);white-space:nowrap;vertical-align:1px}
+.dayhead .ok .ic{width:14px;height:14px;color:var(--clear)}
 .row{display:grid;grid-template-columns:100px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--rule-2)}
 .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);line-height:1.35}
 .tag{display:flex;gap:7px;align-items:flex-start}
@@ -193,6 +195,7 @@ function highNear(M,t,win){
 function highTxt(h){return "High "+T.fmtT(h.ms)+" · "+h.v.toFixed(1)+" ft";}
 function tagHTML(lbl){var p=lbl.split(" → ");return p[0]+(p[1]?"<small>→ "+p[1]+"</small>":"");}
 var CHEV='<svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5l5 5.5-5 5.5"/></svg>';
+var OK_IC='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>';
 function rowOpen(cls,it){
   var i=ITEMS.push(it)-1;
   return '<div class="row'+(cls?" "+cls:"")+'" role="button" tabindex="0" aria-haspopup="dialog" data-i="'+i+'">';
@@ -210,12 +213,14 @@ function render(m){
     /* high tides that don't reach the road still get a quiet row, so every high tide is listed */
     M.highs.forEach(function(h){if(T.dayStart(h.ms)===k&&h.ms>=n&&!used[h.ms])items.push({ms:h.ms,dry:h});});
     items.sort(function(a,b){return a.ms-b.ms;});
-    html+='<section class="day"><div class="dayhead"><b>'+T.dayName(k,n)+'</b><span>'+
+    /* a day with no closures says so in its heading, since every high tide already has its own row; today keeps a
+       line once its closures have passed, because "No closures" would be wrong there */
+    var clear=!items.some(function(i){return i.c;}),
+        hadEarlier=clear&&k===today&&M.closures.some(function(c){return T.dayStart(c.s)===k;});
+    html+='<section class="day"><div class="dayhead"><div><b>'+T.dayName(k,n)+'</b>'+
+      (clear&&!hadEarlier?'<span class="ok">'+OK_IC+'No closures</span>':'')+'</div><span>'+
       T.fmtD(k,rel?{weekday:"short",month:"short",day:"numeric"}:{month:"short",day:"numeric"})+'</span></div>';
-    if(!items.some(function(i){return i.c;})){
-      var hadEarlier=k===today&&M.closures.some(function(c){return T.dayStart(c.s)===k;});
-      html+='<div class="none">'+(hadEarlier?"No more closures today":"No closures — clear all day")+'</div>';
-    }
+    if(hadEarlier)html+='<div class="none">No more closures today</div>';
     items.forEach(function(it){
       it.k=k;
       if(it.c){
@@ -357,8 +362,10 @@ function openDetail(it){
   }else if(it.x){
     var x=it.x;
     h=x._h;pkMs=x.ms;pkLvl=x.lvl;slot=T.SLOTS[T.slotOf(x.ms)].n;
-    verdict='<div class="verdict near"><b>Close call</b><small>The forecast peak is '+((T.ROAD-x.lvl)*12<1?'just':inchesTxt((T.ROAD-x.lvl)*12))+' below the road at '+
-      T.fmtT(x.ms)+' — close enough that it could still get wet</small></div>';
+    /* within an inch, both heights round to the road's, so "below" would contradict the numbers */
+    verdict='<div class="verdict near"><b>Close call</b><small>'+((T.ROAD-x.lvl)*12<1?
+      'The forecast peak is right at the road’s height at '+T.fmtT(x.ms)+', so it could go either way':
+      'The forecast peak is '+inchesTxt((T.ROAD-x.lvl)*12)+' below the road at '+T.fmtT(x.ms)+' — close enough that it could still get wet')+'</small></div>';
   }else{
     var p=peakNear(it.dry.ms);
     h=it.dry;pkMs=p.ms;pkLvl=p.lvl;slot=T.SLOTS[T.slotOf(h.ms)].n;

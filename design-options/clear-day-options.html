@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Days with no closures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1800px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:80ch;margin:8px 0 0;font-size:15px}
+.grid{display:flex;flex-wrap:wrap;gap:26px;margin-top:22px;align-items:flex-start}
+figure{margin:0;width:390px}
+figure.small{width:320px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:78px}
+.phone{background:var(--ground);border:1px solid var(--rule);border-radius:26px;padding:4px 16px 10px;box-shadow:var(--shadow);overflow:hidden}
+
+/* rows, copied from the live page */
+.day{margin-top:8px}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 2px 6px;border-bottom:1px solid var(--rule)}
+.dayhead b{font-family:var(--display);font-size:18px;font-weight:700}
+.dayhead>span{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.row{display:grid;grid-template-columns:100px minmax(0,1fr) auto 8px;align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--rule-2)}
+.small .row{grid-template-columns:72px minmax(0,1fr) auto 8px;gap:8px}
+.small .tag .ic{display:none}
+.small .none{padding-left:82px}
+.tag{display:flex;gap:7px;align-items:flex-start;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);line-height:1.35}
+.tag .ic{margin-top:-1px;width:14px;height:14px}
+.when{font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.25}
+.row.near .when{font-size:15px;font-weight:500;color:var(--ink-2)}
+.row.dry .when{font-size:14px;font-weight:500;color:var(--muted)}
+.row.dry .tag{color:var(--muted)}
+.dur{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35}
+.none{padding:11px 2px 11px 112px;color:var(--muted);font-size:14px;border-bottom:1px solid var(--rule-2)}
+.chev{width:8px;height:13px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 6b: the all-clear moves into the day heading */
+.dayhead .ok{display:inline-flex;align-items:center;gap:5px;margin-left:9px;font-size:13px;font-weight:600;color:var(--clear-ink);white-space:nowrap;vertical-align:1px}
+.dayhead .ok .ic{width:14px;height:14px;color:var(--clear)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Days with no closures</h1>
+  <p class="lede">Every high tide now gets its own row, so “No closures — clear all day” sits above rows that already say “Road stays dry”.
+    Each card shows the same three days from the live page. Today’s own line (“No more closures today”, once earlier closures have passed) stays
+    in every option.</p>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+(function(){
+"use strict";
+function ic(p){return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';}
+var MOON=ic('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>');
+var RISE=ic('<path d="M17 18a5 5 0 0 0-10 0M12 2v7M4.22 10.22l1.42 1.42M1 18h2M21 18h2M18.36 11.64l1.42-1.42M23 22H1M8 6l4-4 4 4"/>');
+var SUN=ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>');
+var SET=ic('<path d="M17 18a5 5 0 0 0-10 0M12 9V2M4.22 10.22l1.42 1.42M1 18h2M21 18h2M18.36 11.64l1.42-1.42M23 22H1M16 5l-4 4-4-4"/>');
+var CHECK=ic('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/>');
+var CHEV='<svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5l5 5.5-5 5.5"/></svg>';
+function tag(icon,t){return '<div class="tag">'+icon+'<div>'+t+'</div></div>';}
+function dry(icon,t,h,ft){return '<div class="row dry">'+tag(icon,t)+'<div><div class="when">Road stays dry</div><div class="dur">High '+h+' · '+ft+' ft</div></div><span></span>'+CHEV+'</div>';}
+function near(icon,t,h,ft){return '<div class="row near">'+tag(icon,t)+'<div><div class="when">Close call</div><div class="dur">High '+h+' · '+ft+' ft</div></div><span></span>'+CHEV+'</div>';}
+function shut(icon,t,range,h,ft,depth){return '<div class="row">'+tag(icon,t)+'<div><div class="when">'+range+'</div><div class="dur">High '+h+' · '+ft+' ft</div></div>'+
+  '<span class="pill" style="background:var(--shallow-bg)"><i class="dot" style="background:var(--shallow)"></i>'+depth+'</span>'+CHEV+'</div>';}
+var DAYS=[
+  {name:'Tomorrow',date:'Wed, Sep 16',clear:false,rows:dry(MOON,'Overnight','3:38am','9.6')+shut(SUN,'Afternoon','3:42–3:54pm','3:49pm','10.3','&lt;1 in')},
+  {name:'Thursday',date:'Sep 17',clear:true,rows:dry(MOON,'Overnight','4:27am','9.0')+near(SUN,'Afternoon','4:37pm','9.9')},
+  {name:'Saturday',date:'Sep 19',clear:true,rows:dry(RISE,'Morning','6:17am','8.3')+dry(SET,'Evening','6:27pm','9.4')}
+];
+function day(d,mode){
+  var head='<div class="dayhead"><div><b>'+d.name+'</b>'+(mode==='b'&&d.clear?'<span class="ok">'+CHECK+'No closures</span>':'')+'</div><span>'+d.date+'</span></div>';
+  return '<section class="day">'+head+(mode==='today'&&d.clear?'<div class="none">No closures — clear all day</div>':'')+d.rows+'</section>';
+}
+var OPTIONS=[
+  {id:'Today',name:'Today',about:'The line repeats what the grey “Road stays dry” rows already say, and adds a row of height to every clear day.',mode:'today'},
+  {id:'6a',name:'Remove the line',about:'Simplest: the rows speak for themselves. A clear day is one with no bold times or coloured pills.',mode:'a'},
+  {id:'6b',name:'“No closures” in the day heading',about:'A green check next to the day name, so clear days stand out when you skim the week. It says “No closures” rather than “Clear all day” because a clear day can still have a close call (Thursday).',mode:'b'},
+  {id:'6b',name:'6b on a small phone',about:'The same heading at 320 px wide (an older iPhone SE, or a zoomed-in page), to check it still fits on one line.',mode:'b',small:true}
+];
+document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
+  return '<figure'+(o.small?' class="small"':'')+'><figcaption><div class="id">'+(o.id==='Today'?'For comparison':'Option '+o.id)+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption>'+
+    '<div class="phone">'+DAYS.map(function(d){return day(d,o.mode);}).join('')+'</div></figure>';
+}).join('');
+})();
+</script>
+</body>
+</html>
