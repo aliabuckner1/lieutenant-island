@@ -154,6 +154,16 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
 .thanks b{color:var(--ink)}
 .mine{margin-top:18px}
 .mine div:not(.kicker){font-size:13.5px;color:var(--ink-2);padding:7px 0;border-bottom:1px solid var(--rule-2)}
+
+/* ---- add to home screen ---- */
+.install{margin-top:10px;display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:11px 10px 11px 12px}
+.install[hidden]{display:none}
+.install img{width:40px;height:40px;border-radius:9px;flex:none}
+.install b{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
+.install small{display:block;font-size:13px;color:var(--ink-2);line-height:1.4;margin-top:2px}
+.install .btn{margin-top:8px;padding:6px 14px;font-size:13.5px}
+.install .close{border:0;background:none;color:var(--muted);width:28px;height:28px;display:grid;place-items:center;flex:none;margin:-4px -2px 0 auto;cursor:pointer}
+.install .close .ic{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -169,6 +179,12 @@ fieldset{border:0;margin:0;padding:0;min-width:0}
   <div class="statusline" id="status" hidden></div>
   <div class="actions" id="actions" hidden>
     <button class="btn" id="reportBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M17.5 3.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>Report the road</button>
+  </div>
+  <div class="install" id="installNote" hidden>
+    <img src="apple-touch-icon.png" alt="">
+    <div><b>Add it to your home screen</b><small>It opens like an app, one tap away.</small>
+      <button class="btn primary" id="installAdd" type="button">Add</button></div>
+    <button class="close" id="installClose" type="button" aria-label="Not now"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div class="loading" id="loading">Checking the tide…</div>
   <div class="err" id="err" role="alert" hidden></div>
@@ -279,6 +295,24 @@ el("days").addEventListener("click",function(e){var it=rowFrom(e);if(it)openDeta
 el("days").addEventListener("keydown",function(e){
   if(e.key!=="Enter"&&e.key!==" ")return;var it=rowFrom(e);if(it){e.preventDefault();openDetail(it);}});
 el("reportBtn").addEventListener("click",function(){openReport(null);});
+
+/* ---- add to home screen (Android only for now: Chrome, Samsung Internet and Edge offer their own install prompt;
+   iPhones can't be prompted). Shown from someone's second visit, never once they've added it, said no, or closed the note ---- */
+var installEvt=null,visits=0,INSTALL_DONE="li-install-done";
+try{visits=+localStorage.getItem("li-visits")||0;
+  if(!sessionStorage.getItem("li-counted")){visits++;localStorage.setItem("li-visits",visits);sessionStorage.setItem("li-counted","1");}}catch(e){}
+function installDone(){el("installNote").hidden=true;installEvt=null;try{localStorage.setItem(INSTALL_DONE,"1");}catch(e){}}
+window.addEventListener("beforeinstallprompt",function(e){
+  var done=true;try{done=!!localStorage.getItem(INSTALL_DONE);}catch(x){}
+  if(done||visits<2||!/Android/i.test(navigator.userAgent)||matchMedia("(display-mode: standalone)").matches)return;
+  e.preventDefault();installEvt=e;el("installNote").hidden=false;
+});
+el("installAdd").addEventListener("click",function(){
+  var e=installEvt;if(!e)return;
+  installDone();e.prompt();
+});
+el("installClose").addEventListener("click",installDone);
+window.addEventListener("appinstalled",installDone);
 el("aboutBtn").addEventListener("click",openAbout);
 
 /* ---- about this page ---- */
