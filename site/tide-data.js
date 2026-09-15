@@ -168,12 +168,18 @@ function build(r,now){
       wind:w?w.s:null,dir:w?w.dir:null,mb:w?w.p:null,
       liveFt:live==null?null:live*RATIO,gaugeAt:gaugeAt};
   }
-  var series=[];
+  var raw=[],series=[];
   for(var t=d0;t<d0+DAYS*DAY;t+=6*MIN){
-    var a=astroAt(t);if(a==null)continue;
-    var res=blendAt(t).res,lvl=a+res*RATIO;
-    series.push({ms:t,astro:a,surge:res*RATIO,lvl:lvl,inch:(lvl-ROAD)*12});
+    var a=astroAt(t);if(a!=null)raw.push({ms:t,astro:a,res:blendAt(t).res});
   }
+  /* the weather part changes in hourly steps, and drops to the typical amount where the forecast ends; averaging it over
+     an hour either side turns those steps into ramps, so a step can't split one closure into two */
+  raw.forEach(function(p,i){
+    var sum=0,n=0;
+    for(var j=Math.max(0,i-10);j<=Math.min(raw.length-1,i+10);j++)if(Math.abs(raw[j].ms-p.ms)<=HOUR){sum+=raw[j].res;n++;}
+    var res=sum/n,lvl=p.astro+res*RATIO;
+    series.push({ms:p.ms,astro:p.astro,surge:res*RATIO,lvl:lvl,inch:(lvl-ROAD)*12});
+  });
   if(!series.length)throw tideFail();
   var closures=[],cur=null;
   series.forEach(function(p){
