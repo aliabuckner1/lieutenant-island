@@ -314,6 +314,21 @@ el("installAdd").addEventListener("click",function(){
 });
 el("installClose").addEventListener("click",installDone);
 window.addEventListener("appinstalled",installDone);
+/* opening the page with ?install-check shows why the note is or isn't appearing, for testing on a real phone */
+if(/[?&]install-check/.test(location.search)){
+  var chk=document.createElement("p"),offered=false;
+  chk.style.cssText="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6;margin:10px 0 0";
+  el("installNote").insertAdjacentElement("afterend",chk);
+  var paintCheck=function(){var done=null,last=0;try{done=localStorage.getItem(INSTALL_DONE);last=+localStorage.getItem("li-last-visit")||0;}catch(e){}
+    chk.innerHTML="Install check<br>Visit number: "+visits+(visits<2?" (the note starts on visit 2; the next visit counts after "+
+      new Date(last+3600e3).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})+")":"")+
+      "<br>Android: "+(/Android/i.test(navigator.userAgent)?"yes":"no")+
+      "<br>Opened from the home screen: "+(matchMedia("(display-mode: standalone)").matches?"yes":"no")+
+      "<br>Browser has offered to install: "+(offered?"yes":"not yet")+
+      "<br>Note already closed or site added: "+(done?"yes":"no");};
+  window.addEventListener("beforeinstallprompt",function(){offered=true;paintCheck();});
+  paintCheck();
+}
 el("aboutBtn").addEventListener("click",openAbout);
 
 /* ---- about this page ---- */
