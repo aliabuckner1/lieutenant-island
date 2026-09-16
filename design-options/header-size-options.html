@@ -85,7 +85,7 @@ document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
   return '<figure><figcaption><div class="id">Option '+o.id+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption><div class="phone">'+
     '<header class="top"><div><div class="brand">Wellfleet · Cape Cod</div><h2 style="font-size:'+o.size+'px">Lt. Island Tides</h2></div>'+
     '<button class="x" type="button" aria-label="About this page">'+INFO+'</button></header>'+
-    '<p class="sub">When the road is under water, for the next 8&nbsp;days</p>'+
+    '<p class="sub">When the road is underwater, for the next 8&nbsp;days</p>'+
     '<div class="statusline"'+(o.gap?' style="margin-top:'+o.gap+'px"':'')+'><span class="badge" style="background:var(--clear-bg)">'+CHECK+'Clear right now</span><span>next closure 2:30am tonight</span></div>'+
     o.after+rows+'</div></figure>';
 }).join('');

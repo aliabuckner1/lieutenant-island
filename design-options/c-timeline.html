@@ -67,7 +67,7 @@ function statusHTML(M){
   var s=T.statusNow(M),n=s.now;
   if(!s.wet)return '<i class="dot" style="background:var(--clear)"></i><div><b>Clear now</b> · '+
     (s.change?"closes "+T.whenTxt(s.change,n):"no closures this week")+'</div>';
-  return '<i class="dot" style="background:'+s.state.color+'"></i><div><b>Under water now</b> · '+
+  return '<i class="dot" style="background:'+s.state.color+'"></i><div><b>Underwater now</b> · '+
     (s.change?"reopens "+T.whenTxt(s.change,n):"through the forecast")+'</div>';
 }
 function overlapping(M,k){return M.closures.filter(function(c){return c.s<k+T.DAY&&c.e>=k;});}

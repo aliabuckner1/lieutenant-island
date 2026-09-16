@@ -274,7 +274,7 @@ function statusLineHTML(M){
   var s=statusNow(M),n=s.now;
   if(!s.wet)return '<i class="dot" style="background:var(--clear)"></i><span><b>Clear right now</b>'+
     (s.change?" · next closure "+whenTxt(s.change,n):" · no closures this week")+"</span>";
-  return '<i class="dot" style="background:'+s.state.color+'"></i><span><b>Under water right now</b>'+
+  return '<i class="dot" style="background:'+s.state.color+'"></i><span><b>Underwater right now</b>'+
     (s.change?" · reopens "+whenTxt(s.change,n):"")+"</span>";
 }
 function freshHTML(M,note){

@@ -115,7 +115,7 @@ function drawPanel(M){
   ci.over.forEach(function(c){
     var inch=T.inchesOver(c),st=T.stateFor(inch);
     h+='<div class="prow"><div><div class="pt">'+(c.s===M.series[0].ms?"until ":T.fmtT(c.s)+" – ")+T.fmtT(c.e)+'</div>'+
-      '<div class="pm">Under water '+T.fmtDur((c.e-c.s)/T.MIN)+(T.dayStart(c.s)!==k?" · started the day before":"")+'</div></div>'+
+      '<div class="pm">Underwater '+T.fmtDur((c.e-c.s)/T.MIN)+(T.dayStart(c.s)!==k?" · started the day before":"")+'</div></div>'+
       '<span class="pd"><i class="dot" style="background:'+st.color+'"></i>up to '+T.depthTxt(inch)+'</span></div>';
   });
   ci.near.forEach(function(x){

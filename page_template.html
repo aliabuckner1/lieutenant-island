@@ -161,7 +161,7 @@ footer p{margin:7px 0;max-width:70ch}
 <header class="top">
   <div class="eyebrow">Wellfleet · Cape Cod · NOAA 8446613</div>
   <h1>Lieutenant Island Crossing</h1>
-  <p class="sub">When the marsh road is under water — built from NOAA tide predictions, live Boston
+  <p class="sub">When the marsh road is underwater — built from NOAA tide predictions, live Boston
      water levels, forecast wind and barometric pressure, and a lidar survey of the road itself.</p>
   <div class="updated">Forecast built <b id="built"></b> · road low point <b id="roadft"></b> ft above MLLW</div>
 </header>
@@ -191,7 +191,7 @@ footer p{margin:7px 0;max-width:70ch}
     <div class="tip" id="rtip" role="status" aria-live="off"></div>
   </div>
   <details class="tbl"><summary>Show as a table</summary><div style="overflow-x:auto"><table id="closetbl">
-    <thead><tr><th>Day</th><th>Under water</th><th>For</th><th>Deepest</th><th>State</th></tr></thead>
+    <thead><tr><th>Day</th><th>Underwater</th><th>For</th><th>Deepest</th><th>State</th></tr></thead>
     <tbody></tbody></table></div></details>
 </section>
 
@@ -281,7 +281,7 @@ var TZ="America/New_York";
 var STATES=[
  {key:"clear", word:"Road is clear",  color:"#0ca30c", bg:"var(--good-bg)",    lab:"Clear"},
  {key:"wet",   word:"First water",    color:"#fab219", bg:"var(--warning-bg)", lab:"Shallow · under 6 in"},
- {key:"deep",  word:"Under water",    color:"#ec835a", bg:"var(--serious-bg)", lab:"Deep · 6–15 in"},
+ {key:"deep",  word:"Underwater",    color:"#ec835a", bg:"var(--serious-bg)", lab:"Deep · 6–15 in"},
  {key:"shut",  word:"Do not cross",   color:"#d03b3b", bg:"var(--critical-bg)",lab:"Impassable · 15 in +"}
 ];
 function stateFor(inches){ if(inches<=0)return STATES[0]; if(inches<=6)return STATES[1];
@@ -371,7 +371,7 @@ function showBandTip(ev,b){
   rtip.innerHTML='<div class="t">'+
       day.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+'</div>'+
     '<div class="l">'+atMin(day,r.s)+" – "+atMin(day,r.e)+'</div>'+
-    '<div class="d">'+fmtDur(r.e-r.s)+" under water · deepest "+depthTxt(r.pk)+'</div>'+
+    '<div class="d">'+fmtDur(r.e-r.s)+" underwater · deepest "+depthTxt(r.pk)+'</div>'+
     '<div class="cur"><i style="background:'+st.color+'"></i>'+atMin(day,best.m)+" · "+
       (best.p.inch<1?"just at the edge":Math.round(best.p.inch)+" in over road")+'</div>';
   rtip.style.opacity=1;

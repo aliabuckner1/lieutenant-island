@@ -77,7 +77,7 @@ function render(M){
         var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),past=c.e<n,now=c.s<=n&&c.e>=n;
         html+='<div class="row'+(past?" past":"")+(now?" now":"")+'"><div><div class="when">'+
           (c.s===first?"until ":T.fmtT(c.s)+" – ")+T.fmtT(c.e)+'</div><div class="dur">'+
-          (now?"Under water now · ":"")+(c.s===first?"":T.partOfDay(c.s)+" · ")+T.fmtDur((c.e-c.s)/T.MIN)+(past?" · over":"")+'</div></div>'+
+          (now?"Underwater now · ":"")+(c.s===first?"":T.partOfDay(c.s)+" · ")+T.fmtDur((c.e-c.s)/T.MIN)+(past?" · over":"")+'</div></div>'+
           '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+
           T.depthTxt(inch)+'</span></div>';
       }else{

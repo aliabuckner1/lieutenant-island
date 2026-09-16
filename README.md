@@ -1,6 +1,6 @@
 # Lt. Island Tides
 
-**When is the road to Lieutenant Island (Wellfleet, MA) under water?**
+**When is the road to Lieutenant Island (Wellfleet, MA) underwater?**
 Live at **https://aliabuckner1.github.io/lieutenant-island/**. The short link **https://ltisland.netlify.app** forwards there.
 
 Residents of Lieutenant Island use printed tide calendars, built from NOAA's predictions for Wellfleet, to know when the road on

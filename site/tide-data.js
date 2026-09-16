@@ -5,6 +5,9 @@
 /* the road's low point, measured from the road on 2026-09-15: nine tape-measure depths through one tide, each implying
    9.83–9.97 ft (data/road_measurements.csv). It replaces 10.40 ft, which came from lidar and was only good to ±6 in. */
 var ROAD=9.92, RATIO=1.05, TYP=0.58, DAYS=8, NEAR=0.5;  /* near miss = peak within 6 in of the road */
+/* a closure peaking under QUIET_IN inches is a puddle at the low point rather than a crossing to avoid, so it's shown
+   quietly; one lasting BRIEF_MIN minutes or less just says "briefly", since its start and end are within our timing error */
+var QUIET_IN=2, BRIEF_MIN=15;
 var C=[0.5221,-0.0321,-0.0272,-0.0068,-0.0006,0.0308];
 var TZ="America/New_York", LAT=41.8937, LON=-70.0034;
 var NOAA="https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
@@ -220,7 +223,8 @@ function closureAt(M,ms){for(var i=0;i<M.closures.length;i++){var c=M.closures[i
 function statusNow(M){
   var n=nowW(),S=M.series,cur=interp(S,n),wet=cur.inch>0,change=null,next=null,i;
   for(i=0;i<S.length;i++){if(S[i].ms<=n)continue;if((S[i].inch>0)!==wet){change=S[i].ms;break;}}
-  if(!wet)for(i=0;i<M.closures.length;i++)if(M.closures[i].s>n){next=M.closures[i];break;}
+  /* the next closure worth naming up top: a shallow puddle at the low point isn't one */
+  if(!wet)for(i=0;i<M.closures.length;i++)if(M.closures[i].s>n&&(M.closures[i].pk-ROAD)*12>=QUIET_IN){next=M.closures[i];break;}
   return {now:n,inch:cur.inch,lvl:cur.lvl,wet:wet,state:stateFor(cur.inch),change:change,
     closure:wet?closureAt(M,n):null,next:next};
 }
@@ -290,14 +294,15 @@ function highsHTML(M,k,n){
 function partOfDay(ms){var x=D(ms).getUTCHours();
   return x<5?"overnight":x<12?"morning":x<17?"afternoon":x<21?"evening":"night";}
 /* a quiet one-line "right now" — planning ahead is the main job, so this stays small */
-/* right now as a badge (a check when clear, waves when under water), so it doesn't look like the depth colours */
+/* right now as a badge (a check when clear, waves when underwater), so it doesn't look like the depth colours */
 var CHECK_IC='<svg class="ic" style="color:var(--clear)" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>';
 function wavesIc(color){return '<svg class="ic" style="color:'+color+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 15c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>';}
 function statusLineHTML(M){
   var s=statusNow(M),n=s.now;
+  /* name the next real closure, not the next time the water touches the low point: s.next already skips puddles */
   if(!s.wet)return '<span class="badge" style="background:var(--clear-bg)">'+CHECK_IC+'Clear right now</span>'+
-    '<span>'+(s.change?"next closure "+whenTxt(s.change,n):"no closures this week")+"</span>";
-  return '<span class="badge" style="background:var(--'+s.state.cls+'-bg)">'+wavesIc(s.state.color)+'Under water right now</span>'+
+    '<span>'+(s.next?"next closure "+whenTxt(s.next.s,n):"no closures this week")+"</span>";
+  return '<span class="badge" style="background:var(--'+s.state.cls+'-bg)">'+wavesIc(s.state.color)+'Underwater right now</span>'+
     (s.change?"<span>reopens "+whenTxt(s.change,n)+"</span>":"");
 }
 function freshHTML(M,note){
@@ -326,7 +331,7 @@ function run(o){
   window.addEventListener("pageshow",function(e){if(e.persisted&&Date.now()-last>5*MIN)refresh();});
   document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-last>5*MIN)refresh();});
 }
-window.Tides={load:load,run:run,ROAD:ROAD,NEAR:NEAR,MIN:MIN,HOUR:HOUR,DAY:DAY,STATES:STATES,stateFor:stateFor,
+window.Tides={load:load,run:run,ROAD:ROAD,NEAR:NEAR,QUIET_IN:QUIET_IN,BRIEF_MIN:BRIEF_MIN,MIN:MIN,HOUR:HOUR,DAY:DAY,STATES:STATES,stateFor:stateFor,
   nowW:nowW,parseWall:parseWall,dayStart:dayStart,minOfDay:minOfDay,fmtT:fmtT,fmtD:fmtD,fmtDur:fmtDur,longDur:longDur,
   depthTxt:depthTxt,shortBy:shortBy,interp:interp,closureAt:closureAt,statusNow:statusNow,
   openWindows:openWindows,dayName:dayName,whenTxt:whenTxt,inchesOver:inchesOver,partOfDay:partOfDay,statusLineHTML:statusLineHTML,SLOTS:SLOTS,slotOf:slotOf,slotIndex:slotIndex,slotIcon:slotIcon,highsHTML:highsHTML,slotLabel:slotLabel,rangeTxt:rangeTxt,upcomingForDay:upcomingForDay,slotInfo:slotInfo,freshHTML:freshHTML,errorHTML:errorHTML};

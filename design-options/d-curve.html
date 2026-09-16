@@ -158,7 +158,7 @@ function scrub(ev){
   c.setAttribute("cx",SV.x(p.ms));c.setAttribute("cy",SV.y(p.lvl));
   var clo=T.closureAt(MODEL,p.ms);
   el("readout").innerHTML='<b>'+T.fmtD(p.ms,{weekday:"short"})+" "+T.fmtT(p.ms)+'</b> — '+(p.inch>0
-    ?'<span class="o">under water, '+Math.round(p.inch)+' in over the road</span>'+(clo?"<br>reopens "+T.fmtT(clo.e):"")
+    ?'<span class="o">underwater, '+Math.round(p.inch)+' in over the road</span>'+(clo?"<br>reopens "+T.fmtT(clo.e):"")
     :'<span class="k">clear</span>, '+feetIn(-p.inch)+' below the road');
 }
 el("chart").addEventListener("pointerdown",scrub);

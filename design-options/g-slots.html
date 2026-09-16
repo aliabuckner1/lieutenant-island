@@ -63,7 +63,7 @@ function render(M){
         val='<div class="v">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>';
         right='<span class="dd"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span>';
       }else if(si.over.length){
-        val='<div class="v cont">still under water until '+T.fmtT(si.over[0].e)+'</div>';
+        val='<div class="v cont">still underwater until '+T.fmtT(si.over[0].e)+'</div>';
       }else if(si.near.length){
         val='<div class="v cont">close call at '+T.fmtT(si.near[0].ms)+'</div>';
         right='<span class="pill nearpill">'+T.shortBy(si.near[0])+' short</span>';

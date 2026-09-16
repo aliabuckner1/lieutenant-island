@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lieutenant Island Crossing</title>
-<meta name="description" content="When the Lieutenant Island causeway in Wellfleet is under water — closure times for the next eight days from live NOAA tides and the weather forecast.">
+<meta name="description" content="When the Lieutenant Island causeway in Wellfleet is underwater — closure times for the next eight days from live NOAA tides and the weather forecast.">
 <meta property="og:title" content="Lieutenant Island Crossing">
-<meta property="og:description" content="When is the causeway under water? Closure times for the next eight days.">
+<meta property="og:description" content="When is the causeway underwater? Closure times for the next eight days.">
 <meta name="theme-color" content="#E9EFF1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C171B" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E">
@@ -200,7 +200,7 @@ function render(m){
         var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),now=c.s<=n;
         html+=rowOpen("",it)+'<div class="tag">'+T.slotIcon(T.slotIndex(M,c))+'<div>'+tagHTML(T.slotLabel(M,c))+'</div></div>'+
           '<div><div class="when">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>'+
-          '<div class="dur">'+(now?"under water now · ":"")+(c._h?highTxt(c._h):T.fmtDur((c.e-c.s)/T.MIN))+'</div></div>'+
+          '<div class="dur">'+(now?"underwater now · ":"")+(c._h?highTxt(c._h):T.fmtDur((c.e-c.s)/T.MIN))+'</div></div>'+
           '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span>'+CHEV+'</div>';
       }else if(it.x){
         var x=it.x;
@@ -299,7 +299,7 @@ function openDetail(it){
     var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),on=c.s<=n&&c.e>=n;
     h=c._h;pkMs=c.pkMs;pkLvl=c.pk;slot=T.slotLabel(M,c);
     verdict='<div class="verdict" style="background:var(--'+st.cls+'-bg)"><b><i class="dot" style="background:'+st.color+'"></i>'+
-      (on?"Under water now":"Under water "+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e)))+'</b><small>'+
+      (on?"Underwater now":"Underwater "+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e)))+'</b><small>'+
       (on?"Reopens "+T.whenTxt(c.e,n)+" · ":"")+"Deepest about "+T.depthTxt(inch)+" around "+T.fmtT(c.pkMs)+
       (on?"":" · "+T.fmtDur((c.e-c.s)/T.MIN)+" in all")+'</small></div>';
   }else if(it.x){

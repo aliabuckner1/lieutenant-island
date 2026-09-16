@@ -1,7 +1,7 @@
 {
   "name": "Lt. Island Tides",
   "short_name": "Island Tides",
-  "description": "When the road to Lieutenant Island in Wellfleet is under water, for the next 8 days.",
+  "description": "When the road to Lieutenant Island in Wellfleet is underwater, for the next 8 days.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

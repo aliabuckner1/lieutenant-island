@@ -208,7 +208,7 @@ T.forEach(function(o,ix){
   head.appendChild(meta); head.appendChild(right);
   var body=document.createElement("div"); body.className="tbody";
   body.innerHTML='<div class="detail">expected peak <b>'+o.pk.toFixed(2)+' ft</b><br>'+
-    (o.first? 'predicted under water <b>'+ampm(o.first)+'</b> to <b>'+ampm(o.last)+'</b>'
+    (o.first? 'predicted underwater <b>'+ampm(o.first)+'</b> to <b>'+ampm(o.last)+'</b>'
             : 'predicted <b>not to reach the road at all</b> — the test is whether it stays dry')+'</div>';
   function field(k,label,type){
     var w=document.createElement("div"); w.className="field";

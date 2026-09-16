@@ -102,7 +102,7 @@ function render(M){
         var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch),now=c.s<=n;
         html+='<div class="row"><div class="tag">'+T.slotIcon(T.slotIndex(M,c))+'<div>'+tagHTML(T.slotLabel(M,c))+'</div></div>'+
           '<div><div class="when">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>'+
-          '<div class="dur">'+(now?"under water now · ":"")+(c._h?highTxt(c._h):T.fmtDur((c.e-c.s)/T.MIN))+'</div></div>'+
+          '<div class="dur">'+(now?"underwater now · ":"")+(c._h?highTxt(c._h):T.fmtDur((c.e-c.s)/T.MIN))+'</div></div>'+
           '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span></div>';
       }else if(it.x){
         var x=it.x;

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shallow closures: how to show an inch of water</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../site/base.css">
+<style>
+.wrap{max-width:1800px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:86ch;margin:8px 0 0;font-size:15px}
+.sub2{font-family:var(--display);font-size:22px;margin:44px 0 0;padding-top:24px;border-top:1px solid var(--rule)}
+.grid{display:flex;flex-wrap:wrap;gap:26px;margin-top:22px;align-items:flex-start}
+figure{margin:0;width:390px}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:96px}
+.phone{background:var(--ground);border:1px solid var(--rule);border-radius:26px;padding:4px 16px 10px;box-shadow:var(--shadow);overflow:hidden}
+
+/* rows, copied from the live page */
+.day{margin-top:8px}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 2px 6px;border-bottom:1px solid var(--rule)}
+.dayhead b{font-family:var(--display);font-size:18px;font-weight:700}
+.dayhead>span{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.row{display:grid;grid-template-columns:100px minmax(0,1fr) auto 8px;align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--rule-2)}
+.tag{display:flex;gap:7px;align-items:flex-start;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);line-height:1.35}
+.tag .ic{margin-top:-1px;width:14px;height:14px}
+.when{font-size:18px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.25}
+.row.dry .when,.row.quiet .when{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0;font-variant-numeric:normal}
+.row.dry .tag,.row.quiet .tag{color:var(--muted)}
+.dur{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.35}
+.chev{width:8px;height:13px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pill.quiet{background:var(--surface-2);color:var(--muted);font-weight:500}
+.dayhead .ok{display:inline-flex;align-items:center;gap:5px;margin-left:9px;font-size:13px;font-weight:600;color:var(--clear-ink);white-space:nowrap;vertical-align:1px}
+.dayhead .ok .ic{width:14px;height:14px;color:var(--clear)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>An inch of water at the low point</h1>
+  <p class="lede">Now that the road’s low point is measured at 9.9&nbsp;ft, small tides reach it: this week has a six-minute puddle at 3:36am Wednesday
+    and a 42-minute one on Saturday evening, alongside real closures of 4–13&nbsp;inches. These are the real rows from the live page. At these depths the
+    forecast is typically within 3–4&nbsp;inches, so “1 inch” and “dry” are closer together than the page can actually tell apart.</p>
+  <div class="grid" id="grid"></div>
+  <h2 class="sub2">Wording for a very short one</h2>
+  <p class="lede">Wednesday’s six-minute puddle, with the line below it unchanged. The time of the peak and the time of high tide are the same thing here,
+    so anything naming a clock time repeats the line underneath.</p>
+  <div class="grid" id="grid2"></div>
+</div>
+<script>
+(function(){
+"use strict";
+function ic(p){return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';}
+var MOON=ic('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>');
+var SUN=ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>');
+var SET=ic('<path d="M17 18a5 5 0 0 0-10 0M12 9V2M4.22 10.22l1.42 1.42M1 18h2M21 18h2M18.36 11.64l1.42-1.42M23 22H1M16 5l-4 4-4-4"/>');
+var CHEV='<svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5l5 5.5-5 5.5"/></svg>';
+/* the real rows from the live page (road at 9.9 ft) */
+var DAYS=[
+  {day:'Tomorrow',date:'Wed, Sep 16',rows:[
+    {icon:MOON,tag:'Overnight',range:'3:36–3:42am',peak:'3:38am',mins:6,inch:0.1,pill:'&lt;1 in',high:'High 3:38am · 9.6 ft'},
+    {icon:SUN,tag:'Afternoon',range:'2:54–4:54pm',peak:'3:49pm',mins:120,inch:7.6,pill:'8 in',high:'High 3:49pm · 10.3 ft'}]},
+  {day:'Thursday',date:'Sep 17',rows:[
+    {dry:true,icon:MOON,tag:'Overnight',high:'High 4:27am · 9.0 ft'},
+    {icon:SUN,tag:'Afternoon',range:'3:54–5:24pm',peak:'4:37pm',mins:90,inch:4,pill:'4 in',high:'High 4:37pm · 9.9 ft'}]},
+  {day:'Saturday',date:'Sep 19',rows:[
+    {dry:true,icon:SUN,tag:'Morning',high:'High 6:17am · 8.3 ft'},
+    {icon:SET,tag:'Evening',range:'6:06–6:48pm',peak:'6:27pm',mins:42,inch:0.8,pill:'&lt;1 in',high:'High 6:27pm · 9.4 ft'}]}
+];
+function pill(r,mode){
+  if(r.dry)return '<span></span>';
+  var quiet=mode!=='now'&&r.inch<2;
+  if(mode==='band'&&r.inch<2)return '<span class="pill" style="background:#7fb1e02e"><i class="dot" style="background:#6a9bcb"></i>'+r.pill+'</span>';
+  if(quiet)return '<span class="pill quiet">'+r.pill+'</span>';
+  var deep=r.inch>=6;
+  return '<span class="pill" style="background:var(--'+(deep?'deep':'shallow')+'-bg)"><i class="dot" style="background:var(--'+(deep?'deep':'shallow')+')"></i>'+r.pill+'</span>';
+}
+function when(r,mode){
+  if(r.dry)return 'Road stays dry';
+  if(mode==='now'||mode==='band'||r.inch>=2)return r.range;
+  if(mode==='brief'&&r.mins<=15)return 'Briefly covered';
+  return r.range;
+}
+function row(r,mode){
+  var quiet=!r.dry&&mode!=='now'&&mode!=='band'&&r.inch<2;
+  return '<div class="row'+(r.dry?' dry':(quiet?' quiet':''))+'"><div class="tag">'+r.icon+'<div>'+r.tag+'</div></div>'+
+    '<div><div class="when">'+when(r,mode)+'</div><div class="dur">'+r.high+'</div></div>'+pill(r,mode)+CHEV+'</div>';
+}
+var OPTIONS=[
+  {id:'Today',name:'Today',mode:'now',about:'Every closure looks the same: bold times and a yellow pill. A six-minute puddle reads exactly like a two-hour crossing being shut.'},
+  {id:'A',name:'Quiet style under 2 in',about:'Under 2 inches the row goes grey, with a grey pill. The wording doesn’t change: the pill already says how deep it is. Deeper closures are untouched, and the “next closure” line at the top would skip these.',mode:'quiet'},
+  {id:'A+',name:'Quiet, and “Briefly covered” under 15 min',about:'Same, but a closure shorter than 15 minutes reads “Briefly covered” instead of 3:36–3:42am. It avoids claiming we know a six-minute window to the minute, and repeats nothing: the time is on the line below, the depth is in the pill.',mode:'brief'},
+  {id:'C',name:'A separate colour for 0–2 in',about:'Rows stay bold, but 0–2 inches gets its own pale blue instead of the yellow used up to 6 inches. Fixes the colour scale, but the row still reads like a closure, and it changes the bands described in the About panel.',mode:'band'}
+];
+var WORDS=[
+  {id:'1',text:'Briefly covered',note:'A complete thought, and it pairs with the dry rows: “Road stays dry” / “Briefly covered”. Nothing repeated. Claude’s pick.'},
+  {id:'2',text:'Briefly',note:'Shortest, but a fragment with no verb.'},
+  {id:'3',text:'Briefly under water',note:'Matches the page’s own phrase (“when the road is under water”), one word longer.'},
+  {id:'4',text:'Briefly at high tide',note:'The shape of “Briefly at 3:38am”, but accurate and without repeating the time on the line below.'},
+  {id:'5',text:'Briefly around 3:38am',note:'“At” claims the minute; “around” doesn’t. Dropping the comma is what makes it read quickly.'},
+  {id:'6',text:'Briefly, around 3:38am',note:'Same words with the comma, which is what felt wordy.'},
+  {id:'7',text:'Briefly at 3:38am',note:'Reads well, but “at” claims a minute we don’t know, and it repeats the line below.'},
+  {id:'8',text:'3:36–3:42am',note:'Option A: leave the exact times, greyed out like the rest of the row.'}
+];
+document.getElementById('grid2').innerHTML=WORDS.map(function(w){
+  var wed=DAYS[0].rows;
+  return '<figure style="width:390px"><figcaption><div class="id">Wording '+w.id+'</div><b>'+w.text+'</b><p style="min-height:56px">'+w.note+'</p></figcaption>'+
+    '<div class="phone"><section class="day"><div class="dayhead"><div><b>Tomorrow</b></div><span>Wed, Sep 16</span></div>'+
+    '<div class="row quiet"><div class="tag">'+wed[0].icon+'<div>Overnight</div></div><div><div class="when">'+w.text+'</div>'+
+      '<div class="dur">'+wed[0].high+'</div></div><span class="pill quiet">&lt;1 in</span>'+CHEV+'</div>'+
+    row(wed[1],'quiet')+'</section></div></figure>';
+}).join('');
+document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
+  var body=DAYS.map(function(d){
+    return '<section class="day"><div class="dayhead"><div><b>'+d.day+'</b></div><span>'+d.date+'</span></div>'+
+      d.rows.map(function(r){return row(r,o.mode);}).join('')+'</section>';
+  }).join('');
+  return '<figure><figcaption><div class="id">'+(o.id==='Today'?'For comparison':'Option '+o.id)+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption>'+
+    '<div class="phone">'+body+'</div></figure>';
+}).join('');
+})();
+</script>
+</body>
+</html>

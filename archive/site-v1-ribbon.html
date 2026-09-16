@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Lieutenant Island Crossing</title>
-<meta name="description" content="When the Lieutenant Island causeway in Wellfleet is under water, for the next eight days — live from NOAA tides and the weather forecast.">
+<meta name="description" content="When the Lieutenant Island causeway in Wellfleet is underwater, for the next eight days — live from NOAA tides and the weather forecast.">
 <meta property="og:title" content="Lieutenant Island Crossing">
-<meta property="og:description" content="When is the causeway under water? Live closures for the next eight days.">
+<meta property="og:description" content="When is the causeway underwater? Live closures for the next eight days.">
 <meta name="theme-color" content="#E9EFF1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C171B" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E">
@@ -126,7 +126,7 @@ footer p{margin:6px 0;max-width:78ch}
 </header>
 
 <div class="sechead">
-  <h2>When the road is under water</h2>
+  <h2>When the road is underwater</h2>
   <div class="note">Each row is one day, midnight to midnight. Tap or hover a band for the depth minute by minute.</div>
 </div>
 <div class="legend" id="legend"></div>
@@ -353,7 +353,7 @@ function showBandTip(ev,b,tk){
   var st=stateFor(best.p.inch);
   rtip.innerHTML='<div class="t">'+fmtD(c.s,{weekday:"long",month:"short",day:"numeric"})+'</div>'+
     '<div class="l">'+fmtT(c.s)+" – "+fmtT(c.e)+'</div>'+
-    '<div class="d">'+fmtDur((c.e-c.s)/MIN)+" under water · deepest "+depthTxt((c.pk-ROAD)*12)+'</div>'+
+    '<div class="d">'+fmtDur((c.e-c.s)/MIN)+" underwater · deepest "+depthTxt((c.pk-ROAD)*12)+'</div>'+
     '<div class="cur"><i style="background:'+st.color+'"></i>'+fmtT(best.p.ms)+" · "+
       (best.p.inch<1?"just at the edge":Math.round(best.p.inch)+" in over road")+'</div>';
   placeTip(b,cx,tk);
@@ -409,7 +409,7 @@ function layoutLabels(tr){
       return o;
     }
     var c=it._clo,wt=c.e>=now?10:1,S=t(c.s),E=t(c.e);
-    if(it._carryIn&&it._carryOut){ /* under water all day: nothing beside it to label */ }
+    if(it._carryIn&&it._carryOut){ /* underwater all day: nothing beside it to label */ }
     else if(it._carryIn){o.push({rects:[right("until "+E)],score:wt});}
     else if(it._carryOut){o.push({rects:[left(S+"–"+E)],score:wt});o.push({rects:[left("from "+S)],score:wt*0.7});}
     else{o.push({rects:[left(S),right(E)],score:wt+0.3});
@@ -453,7 +453,7 @@ function renderRibbons(M){
     tr.addEventListener("mouseleave",hideBandTip);
     tr.addEventListener("touchstart",trackHit,{passive:true});
     tr.addEventListener("touchmove",trackHit,{passive:true});
-    /* one band per contiguous stretch under water; the gradient shows it deepening then easing */
+    /* one band per contiguous stretch underwater; the gradient shows it deepening then easing */
     var run=null,runs=[];
     pts.forEach(function(p){
       var mins=minOfDay(p.ms);
@@ -472,7 +472,7 @@ function renderRibbons(M){
       b._run=r;b._pts=pts;b._carryIn=r.s===0;b._carryOut=r.e>=1434;
       b._clo=closureFor(M,k+r.s*MIN)||{s:k+r.s*MIN,e:k+r.e*MIN,pk:ROAD};
       b.setAttribute("role","img");
-      b.setAttribute("aria-label","Under water "+fmtT(b._clo.s)+" to "+fmtT(b._clo.e)+
+      b.setAttribute("aria-label","Underwater "+fmtT(b._clo.s)+" to "+fmtT(b._clo.e)+
         ", up to "+depthTxt((b._clo.pk-ROAD)*12)+" over the road");
       tr._bands.push(b);tr.appendChild(b);
     });

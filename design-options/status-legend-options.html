@@ -61,7 +61,7 @@ figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:58
   <h1>Status vs. legend</h1>
   <p class="lede">Right now the "right now" status and the depth key are both coloured dots, so they read as the same kind of thing.
     Each option below keeps the rest of the page the same. Every card shows the clear state at the top, a sample closure and close call,
-    and what the status looks like when the road is under water.</p>
+    and what the status looks like when the road is underwater.</p>
   <div class="grid" id="grid"></div>
 </div>
 <script>
@@ -73,10 +73,10 @@ var CHECK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12
 var WAVES='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 15c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>';
 
 var dotStatus=function(wet){return '<div class="statusline">'+(wet
-  ?'<i class="dot" style="background:var(--deep)"></i><span><b>Under water right now</b> · reopens 3:48pm today</span>'
+  ?'<i class="dot" style="background:var(--deep)"></i><span><b>Underwater right now</b> · reopens 3:48pm today</span>'
   :'<i class="dot" style="background:var(--clear)"></i><span><b>Clear right now</b> · next closure 2:24am tonight</span>')+'</div>';};
 var badgeStatus=function(wet){return '<div class="statusrow">'+(wet
-  ?'<span class="badge wet">'+WAVES+'Under water right now</span><span>reopens 3:48pm today</span>'
+  ?'<span class="badge wet">'+WAVES+'Underwater right now</span><span>reopens 3:48pm today</span>'
   :'<span class="badge clear">'+CHECK+'Clear right now</span><span>next closure 2:24am tonight</span>')+'</div>';};
 
 var dotKey='<div class="key"><span><i class="dot" style="background:#fab219"></i>under 6 in</span><span><i class="dot" style="background:#ec835a"></i>6–15 in</span>'+
@@ -98,7 +98,7 @@ var rows='<div class="dayhead"><b>Tomorrow</b><span>Tue, Sep 15</span></div>'+
 
 var OPTIONS=[
   {id:'A',name:'Today',about:'Dots for both. The green status dot and the yellow, orange and red key dots look like one set.',status:dotStatus,key:dotKey},
-  {id:'B',name:'Status badge',about:'"Right now" becomes a tinted badge with an icon (a check when clear, waves when under water). The key stays as dots.',status:badgeStatus,key:dotKey},
+  {id:'B',name:'Status badge',about:'"Right now" becomes a tinted badge with an icon (a check when clear, waves when underwater). The key stays as dots.',status:badgeStatus,key:dotKey},
   {id:'C',name:'Badge + pill key',about:'The key uses the same pills as the tide rows, so it reads as "this is what the pills mean".',status:badgeStatus,key:pillKey},
   {id:'D',name:'Badge, no key',about:'Every row already says how deep ("3 in", "1 in short"), so the key goes. Cleanest; the colours explain themselves once you see a few rows.',status:badgeStatus,key:''},
   {id:'E',name:'Badge + depth scale',about:'The key becomes one bar from 0 to 15 in +, which reads as a scale rather than another status.',status:badgeStatus,key:scaleKey}
@@ -107,7 +107,7 @@ document.getElementById('grid').innerHTML=OPTIONS.map(function(o){
   return '<figure><figcaption><div class="id">Option '+o.id+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption>'+
     '<div class="phone"><div class="brand">Lieutenant Island · Wellfleet</div><h2>Causeway crossing</h2>'+
     o.status(false)+o.key+rows+
-    '<div class="state">When the road is under water</div>'+o.status(true)+'</div></figure>';
+    '<div class="state">When the road is underwater</div>'+o.status(true)+'</div></figure>';
 }).join('');
 })();
 </script>

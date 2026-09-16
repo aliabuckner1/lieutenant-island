@@ -84,7 +84,7 @@ function render(M){
       if(it.c){
         var c=it.c,inch=T.inchesOver(c),st=T.stateFor(inch);
         html+='<div class="row"><div><div class="when">'+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e))+'</div>'+
-          '<div class="dur">'+(c.s<=n?"under water now · ":T.slotLabel(M,c).toLowerCase()+" · ")+T.fmtDur((c.e-c.s)/T.MIN)+'</div></div>'+
+          '<div class="dur">'+(c.s<=n?"underwater now · ":T.slotLabel(M,c).toLowerCase()+" · ")+T.fmtDur((c.e-c.s)/T.MIN)+'</div></div>'+
           '<span class="pill" style="background:var(--'+st.cls+'-bg)"><i class="dot" style="background:'+st.color+'"></i>'+T.depthTxt(inch)+'</span></div>';
       }else{
         var x=it.x;
