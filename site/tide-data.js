@@ -2,7 +2,9 @@
    Extracted from site/index.html (tested against the Python pipeline). */
 (function(){
 "use strict";
-var ROAD=10.40, RATIO=1.05, TYP=0.58, DAYS=8, NEAR=0.5;  /* near miss = peak within 6 in of the road */
+/* the road's low point, measured from the road on 2026-09-15: nine tape-measure depths through one tide, each implying
+   9.83–9.97 ft (data/road_measurements.csv). It replaces 10.40 ft, which came from lidar and was only good to ±6 in. */
+var ROAD=9.92, RATIO=1.05, TYP=0.58, DAYS=8, NEAR=0.5;  /* near miss = peak within 6 in of the road */
 var C=[0.5221,-0.0321,-0.0272,-0.0068,-0.0006,0.0308];
 var TZ="America/New_York", LAT=41.8937, LON=-70.0034;
 var NOAA="https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
@@ -304,7 +306,7 @@ function freshHTML(M,note){
   var miss=[!M.windOK&&"wind",!M.pressOK&&"pressure"].filter(Boolean).join(" and ");
   if(miss)bits.push('<span class="warn">'+miss+" forecast unavailable — typical surge assumed</span>");
   if(note)bits.push('<span class="warn">'+note+"</span>");
-  bits.push("depths are estimates (road height ±6 inches) — give yourself margin");
+  bits.push("depths are estimates — give yourself margin");
   return bits.join(" · ");
 }
 function errorHTML(err){

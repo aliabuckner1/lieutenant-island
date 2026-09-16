@@ -1,6 +1,6 @@
 import json,urllib.request,urllib.parse,csv,datetime as dt,bisect,math,statistics as st,sys
 
-ROAD_FT_MLLW = 10.40          # lidar low point via VDatum -- CALIBRATE WITH GROUND TRUTH
+ROAD_FT_MLLW = 9.92           # measured from the road 2026-09-15 (data/road_measurements.csv); lidar had said 10.40
 ROAD_UNCERT  = 0.50
 RATIO        = 1.05           # Wellfleet / Boston height ratio (NOAA subordinate offset)
 # surge model: resid_ft = c0 + c1*(mb-1015) + c2*u + c3*v + c4*spd*v + c5*(yr-2020)

@@ -29,7 +29,8 @@ measured:
 ## How it works
 
 The page runs entirely in the browser. On every load it fetches NOAA tide predictions, the live Boston tide gauge, the NWS wind
-forecast and Open-Meteo pressure, then compares the result with the road's low point: 10.4 ft above MLLW, known to about ±6 in.
+forecast and Open-Meteo pressure, then compares the result with the road's low point: 9.9 ft above MLLW, measured from the road on 15 Sep 2026
+(nine tape-measure depths through one tide, `data/road_measurements.csv`). It had been 10.4 ft from lidar, good to about ±6 in.
 No server and no build step.
 
 ## What's where
