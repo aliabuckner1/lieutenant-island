@@ -1,0 +1,26 @@
+fitted on 2554 tides 2015-01 to 2023-12 (observed weather)
+
+ANNUAL CYCLE BY ERA (should agree if it's real)
+   2015-2019 (n=1361): amplitude ±2.2 in, peak around Jan 21
+   2020-2023 (n=1193): amplitude ±2.7 in, peak around Jan 10
+   2015-2023 (n=2554): amplitude ±2.5 in, peak around Jan 15
+
+911 Boston high tides 2024-26 scored with the FORECAST available N days ahead (RMSE in inches; bias in brackets)
+days    n         shipped        site form   + annual cycle   + wind squared           + both
+   0  911    3.86 (+0.2)    3.87 (+0.2)    3.64 (-0.2)    3.81 (+0.1)    3.56 (-0.3)
+   1  893    3.74 (+0.4)    3.74 (+0.4)    3.56 (+0.1)    3.68 (+0.2)    3.44 (+0.0)
+   2  892    3.92 (+0.3)    3.93 (+0.2)    3.80 (-0.0)    3.91 (-0.0)    3.75 (-0.2)
+   3  891    3.96 (+0.3)    3.96 (+0.2)    3.81 (+0.0)    3.98 (-0.0)    3.80 (-0.2)
+   4  890    4.15 (+0.3)    4.15 (+0.3)    4.01 (+0.0)    4.18 (+0.0)    4.01 (-0.2)
+   5  889    4.32 (+0.4)    4.32 (+0.3)    4.20 (+0.1)    4.36 (+0.1)    4.24 (-0.1)
+   6  888    4.55 (+0.4)    4.55 (+0.3)    4.50 (+0.0)    4.57 (+0.0)    4.49 (-0.2)
+   7  887    4.81 (+0.3)    4.80 (+0.2)    4.76 (+0.0)    4.77 (+0.0)    4.73 (-0.2)
+   average over days 0-7:  shipped 4.16   site form 4.16   + annual cycle 4.03   + wind squared 4.16   + both 4.00
+
+   Sep-Nov tides only, 1 day ahead (the road's season):   site form 3.40 (-0.2)   + annual cycle 3.47 (-0.5)   + wind squared 3.47 (-0.3)   + both 3.41 (-0.4)
+
+coefficients (ft):
+   site form        [0.5202, -0.032, -0.0265, -0.0055, -0.0007, 0.0322]
+   + annual cycle   [0.5399, -0.0343, -0.0322, -0.0012, -0.0007, 0.036, 0.0512, 0.2014]
+   + wind squared   [0.4761, -0.0303, 0.0089, -0.0113, -0.0001, 0.0318, -0.0021, 0.0004]
+   + both           [0.5424, -0.0334, -0.0019, -0.0027, -0.0007, 0.034, 0.0508, 0.1832, -0.0017, -0.0]
