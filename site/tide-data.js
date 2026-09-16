@@ -14,12 +14,13 @@ var NOAA="https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
 var MIN=60000, HOUR=3600000, DAY=86400000;
 var STATES=[
  {color:"#0ca30c", lab:"Clear", cls:"clear"},
- {color:"#fab219", lab:"Shallow · under 6 in", cls:"shallow"},
+ {color:"#63808B", lab:"Wet · under 2 in", cls:"wet"},
+ {color:"#fab219", lab:"Shallow · 2–6 in", cls:"shallow"},
  {color:"#ec835a", lab:"Deep · 6–15 in", cls:"deep"},
  {color:"#d03b3b", lab:"Impassable · 15 in +", cls:"shut"}
 ];
-function stateFor(inches){ if(inches<=0)return STATES[0]; if(inches<=6)return STATES[1];
-  if(inches<=15)return STATES[2]; return STATES[3]; }
+function stateFor(inches){ if(inches<=0)return STATES[0]; if(inches<QUIET_IN)return STATES[1];
+  if(inches<=6)return STATES[2]; if(inches<=15)return STATES[3]; return STATES[4]; }
 
 /* ---- time ----
    Every timestamp is Wellfleet wall-clock time (America/New_York), held as a UTC millisecond

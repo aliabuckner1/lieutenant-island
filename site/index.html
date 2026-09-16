@@ -46,9 +46,10 @@
 .row.dry .when{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0}
 .row.dry .tag{color:var(--muted)}
 /* a puddle at the low point: same row, quieter, so it can't be mistaken for a crossing to avoid */
-.row.quiet .when{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0;font-variant-numeric:normal}
+/* quieter than a real closure, but never fainter than a close call: there IS water on the road here */
+.row.quiet .when{font-family:var(--body);font-size:15px;font-weight:500;color:var(--ink-2);letter-spacing:0;font-variant-numeric:normal}
 .row.quiet .tag{color:var(--muted)}
-.pill.quiet{background:var(--surface-2);color:var(--muted);font-weight:500}
+.pill.quiet{background:var(--surface-2);color:var(--ink-2);font-weight:500}
 .dur b{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .s-short .row{padding:13px 2px}
