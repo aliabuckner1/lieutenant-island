@@ -1,0 +1,16 @@
+GoMOFS runs on the server: 2026-08-16 to 2026-09-16 (32 days)
+Boston MSL is 5.20 ft above MLLW (model water level is relative to MSL)
+
+56 high tides scored, leads 12-36 h, 2026-08-17 to 2026-09-15
+observed surge over the window: mean +6.3 in, sd 2.7 in
+GoMOFS surge minus observed:    mean +1.5 in  (a constant offset; removed below)
+
+TYPICAL ERROR AT HIGH TIDE (RMSE, inches)
+   tide chart alone                       6.87
+   chart + fixed typical amount (7 in)   2.73
+   chart + this window's own mean        2.66   (unfair: uses hindsight)
+   persistence (same tide 24 h earlier)   1.98   (n=55)
+   GoMOFS, offset removed                 3.41
+
+correlation between GoMOFS surge and observed surge, tide to tide: 0.40
+tides with |observed surge| >= 6 in (n=30): GoMOFS error 3.57 vs chart+typical 2.14
