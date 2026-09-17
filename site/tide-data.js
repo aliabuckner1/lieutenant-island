@@ -60,7 +60,7 @@ function noaa(p){
     if(j&&j.error)throw new Error(j.error.message||"NOAA error");return j;});
 }
 function load(){
-  var now=nowW(),d0=dayStart(now),b=ymd(d0-DAY),e=ymd(d0+(DAYS+1)*DAY);
+  var now=nowW(),d0=dayStart(now),b=ymd(d0-2*DAY),e=ymd(d0+(DAYS+1)*DAY);  /* two days back, so a report can be graded against the gauge as it read a day before */
   return Promise.allSettled([
     noaa({station:"8443970",product:"predictions",interval:"6",begin_date:b,end_date:e}),
     noaa({station:"8443970",product:"predictions",interval:"hilo",begin_date:b,end_date:e}),
@@ -110,9 +110,9 @@ function build(r,now){
 
   /* 2. surge right now: Boston gauge minus Boston prediction, averaged over the last hour */
   var pm={};bos6J.predictions.forEach(function(p){pm[p.t]=+p.v;});
-  var live=null,gaugeAt=null,obsJ=ok(r[3]);
+  var live=null,gaugeAt=null,obsJ=ok(r[3]),obs=[];
   if(obsJ&&obsJ.data){
-    var obs=obsJ.data.filter(function(x){return x.v!==""&&x.v!=null&&pm[x.t]!=null;})
+    obs=obsJ.data.filter(function(x){return x.v!==""&&x.v!=null&&pm[x.t]!=null;})
       .map(function(x){return {ms:parseWall(x.t),r:+x.v-pm[x.t]};});
     if(obs.length&&now-obs[obs.length-1].ms<3*HOUR){
       var last=obs.slice(-10);
@@ -174,6 +174,19 @@ function build(r,now){
       wind:w?w.s:null,dir:w?w.dir:null,mb:w?w.p:null,
       liveFt:live==null?null:live*RATIO,gaugeAt:gaugeAt};
   }
+  /* for grading a road report: what this page would have said `leadH` hours before the moment `ms`. It uses the gauge as
+     it read back then (NOAA's "recent" feed reaches back 3 days) at that lead's share; the weather part is today's
+     forecast for that hour, which moves little over a few hours. Returns null if the gauge has no readings from then */
+  function asOf(ms,leadH){
+    var a=astroAt(ms),end=ms-leadH*HOUR,sum=0,n=0;
+    if(a==null)return null;
+    obs.forEach(function(x){if(x.ms>end-HOUR&&x.ms<=end){sum+=x.r;n++;}});
+    if(n<3)return null;
+    var g=Math.max(0,GAUGE_NOW*(1-leadH/GAUGE_HOURS)),mod=surgeAt(ms),lvl=a+(g*sum/n+(1-g)*(mod!=null?mod:TYP))*RATIO;
+    return {lvl:lvl,inch:(lvl-ROAD)*12};
+  }
+  /* the printed tide chart's water level at one moment, as inches over the road */
+  function chartAt(ms){var a=astroAt(ms);return a==null?null:{lvl:a,inch:(a-ROAD)*12};}
   var raw=[],series=[];
   for(var t=d0;t<d0+DAYS*DAY;t+=6*MIN){
     var a=astroAt(t);if(a!=null)raw.push({ms:t,astro:a,res:blendAt(t).res});
@@ -206,7 +219,7 @@ function build(r,now){
   series.forEach(function(p){var dk=dayStart(p.ms);if(!days[dk]){days[dk]=[];order.push(dk);}days[dk].push(p);});
   /* NOAA's official Wellfleet high waters (the tide-chart times and heights) */
   var highs=whl.filter(function(x){return x.ty==="H"&&x.ms>=d0-DAY&&x.ms<d0+DAYS*DAY;}).map(function(x){return {ms:x.ms,v:x.v};});
-  return {now:now,series:series,closures:closures,near:near,highs:highs,days:days,order:order,live:live,gaugeAt:gaugeAt,explain:explain,
+  return {now:now,series:series,closures:closures,near:near,highs:highs,days:days,order:order,live:live,gaugeAt:gaugeAt,explain:explain,asOf:asOf,chartAt:chartAt,
     windOK:Object.keys(ws).length>0,pressOK:Object.keys(mb).length>0};
 }
 

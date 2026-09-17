@@ -452,7 +452,9 @@ var REPORT_URL="https://script.google.com/macros/s/AKfycbyjioRqCrvPjDhjX7qbR1Pfi
 function sendReport(r){
   var fields={report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
     depth_in:r.depth_in==null?"":String(r.depth_in),depth_how:r.depth_in==null?"":(r.depth_measured?"measured":"estimate"),
-    observer:r.observer||"",forecast_in:r.forecast_in==null?"":String(r.forecast_in),high_tide:r.high_tide||"",reported_at:r.reported_at};
+    observer:r.observer||"",forecast_in:r.forecast_in==null?"":String(r.forecast_in),high_tide:r.high_tide||"",reported_at:r.reported_at,
+    forecast_6h_in:num(r.forecast_6h_in),forecast_24h_in:num(r.forecast_24h_in),chart_in:num(r.chart_in)};
+  function num(x){return x==null?"":String(x);}
   if(!REPORT_URL)return Promise.reject(new Error("no report address set yet"));
   return fetch(REPORT_URL,{method:"POST",body:new URLSearchParams(fields)})
     .then(function(res){if(!res.ok)throw new Error("HTTP "+res.status);return res.json();})
@@ -525,9 +527,12 @@ function saveReport(f,ctx){
   if(isNaN(ms))return fail("Pick when you saw it.");
   if(ms>n+5*T.MIN)return fail("That time hasn’t happened yet.");
   var fc=ms>=S[0].ms&&ms<=S[S.length-1].ms?T.interp(S,ms):null,name=f.observer.value.trim();
+  /* fc leans on the gauge as it reads now, which for a tide that has just happened is hindsight; these are what the page
+     would have said 6 and 24 hours before, plus the printed chart, so the report can grade a forecast someone planned by */
+  function r1(o){return o?Math.round(o.inch*10)/10:null;}
   var rec={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),sent:false,seen_at:v,level:f.level.value,depth_in:depth,depth_measured:depth==null?null:f.depth_how.value==="measured",
     edge:f.edge.checked?(wet?"rising":"falling"):null,observer:name||null,
-    forecast_in:fc?Math.round(fc.inch*10)/10:null,high_tide:ctx&&ctx.h?wallInput(ctx.h.ms):null,
+    forecast_in:fc?Math.round(fc.inch*10)/10:null,forecast_6h_in:r1(M.asOf(ms,6)),forecast_24h_in:r1(M.asOf(ms,24)),chart_in:r1(M.chartAt(ms)),high_tide:ctx&&ctx.h?wallInput(ctx.h.ms):null,
     reported_at:new Date().toISOString()};
   var all=loadReports();all.push(rec);
   try{localStorage.setItem(KEY,JSON.stringify(all));if(name)localStorage.setItem("li-name",name);}catch(e){}

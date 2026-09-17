@@ -10,7 +10,10 @@
    Reports land on the "Reports" tab. Untick the box on the "Settings" tab to stop the email for each report.
    After editing this code: Deploy → Manage deployments → edit (pencil) → Version: New version, so the URL stays the same. */
 
-var FIELDS = ['report_id', 'seen_at', 'level', 'edge', 'depth_in', 'depth_how', 'observer', 'forecast_in', 'high_tide', 'reported_at'];
+var FIELDS = ['report_id', 'seen_at', 'level', 'edge', 'depth_in', 'depth_how', 'observer', 'forecast_in', 'high_tide', 'reported_at',
+  // added 2026-09-16, always at the end so earlier rows keep their columns: what the page would have said 6 and 24 hours
+  // before the time seen, and the printed tide chart, all as inches over the road (negative = below it)
+  'forecast_6h_in', 'forecast_24h_in', 'chart_in'];
 var TZ = 'America/New_York';
 var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -51,7 +54,10 @@ function setup() {
 function emailFor_(p, sheetUrl) {
   var who = p.observer || 'Someone', wet = p.level !== 'dry';
   var when = p.seen_at ? wallTime_(p.seen_at) : null;
-  var fc = p.forecast_in === '' || p.forecast_in == null ? null : Number(p.forecast_in);
+  // grade against the forecast from 6 hours before: forecast_in is worked out when the report is sent, by which time it
+  // leans on the gauge's reading of the very tide being reported. Reports from a phone still running the older page
+  // don't carry it, so those fall back to forecast_in
+  var early = num_(p.forecast_6h_in), fc = early != null ? early : num_(p.forecast_in), chart = num_(p.chart_in);
   var fcWet = fc != null && fc > 0;
 
   // the same start on every report, so they're easy to search for or filter into a label
@@ -63,10 +69,11 @@ function emailFor_(p, sheetUrl) {
   if (p.edge === 'rising') lines.push('  • The water was only just coming over the road');
   if (p.edge === 'falling') lines.push('  • The water had only just gone off the road');
   if (fc != null) {
-    lines.push('', 'The forecast for ' + (when ? when.time : 'that time') + ':',
-      '  • ' + (fcWet ? 'About ' + inches_(fc) + ' over the road' : 'About ' + inches_(-fc) + ' below the road'),
+    lines.push('', 'The forecast for ' + (when ? when.time : 'that time') + (early != null ? ', as it stood 6 hours before:' : ':'),
+      '  • ' + roadText_(fc, true),
       '  • ' + verdict_(wet, fcWet, fc, p.depth_in ? Number(p.depth_in) : null));
   }
+  if (chart != null) lines.push('', 'The printed tide chart had the water ' + roadText_(chart, false) + '.');
   lines.push('', 'Sent at ' + sentAt_(p.reported_at, p.seen_at) + '.');
   if (sheetUrl) lines.push('All reports: ' + sheetUrl);
   return { subject: subject, body: lines.join('\n') };
@@ -82,6 +89,16 @@ function verdict_(wet, fcWet, fc, depth) {
   if (Math.abs(fc) <= 6) return 'Different from the forecast, but close to the road’s height, so it helps pin down how high the road really is';
   if (Math.abs(fc) > 24) return 'Far from the forecast, so the time may be off';
   return 'Different from the forecast, worth a look';
+}
+
+/* inches over the road (negative = below) as words: "about 3 inches over the road", or "just below the road" within an inch */
+function roadText_(x, capital) {
+  var t = (Math.abs(x) < 1 ? 'just' : 'about ' + inches_(Math.abs(x))) + (x > 0 ? ' over' : ' below') + ' the road';
+  return capital ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+}
+
+function num_(v) {
+  return v === '' || v == null || isNaN(Number(v)) ? null : Number(v);
 }
 
 function inches_(x) {
@@ -113,6 +130,9 @@ function reportsTab_() {
     sh.appendRow(['received_at'].concat(FIELDS));
     sh.setFrozenRows(1);
   }
+  // a sheet made by an earlier version of this script: add headings for any columns that have been added since
+  var want = ['received_at'].concat(FIELDS), have = sh.getLastColumn();
+  if (have < want.length) sh.getRange(1, have + 1, 1, want.length - have).setValues([want.slice(have)]);
   return sh;
 }
 
