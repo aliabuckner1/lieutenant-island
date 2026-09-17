@@ -12,9 +12,10 @@
 
 var FIELDS = ['report_id', 'seen_at', 'level', 'edge', 'depth_in', 'depth_how', 'observer', 'forecast_in', 'high_tide', 'reported_at',
   // added 2026-09-16, always at the end so earlier rows keep their columns: what the page would have said 3, 6 and 24 hours
-  // before the time seen, and the printed tide chart, all as inches over the road (negative = below it)
-  'forecast_3h_in', 'forecast_6h_in', 'forecast_24h_in', 'chart_in'];
+  // before the time seen, and the printed tide chart, all as inches over the road (negative = below it); road_ft is the road height the page was using
+  'forecast_3h_in', 'forecast_6h_in', 'forecast_24h_in', 'chart_in', 'road_ft'];
 var TZ = 'America/New_York';
+var OLD_RULE_FT = 9.5;  // the island's rule of thumb: the road floods when the printed chart reads this
 var EMAIL_LEAD = 3;  // which earlier forecast the email compares a report with: 3, 6 or 24 (hours before the time seen)
 var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -51,51 +52,39 @@ function setup() {
   emailOn_();
 }
 
-/* ---- the notification email: a skimmable subject, then what was seen next to what the forecast said ---- */
+/* ---- the notification email: a skimmable subject, then three sentences in the same units — what was seen, what this
+   page's forecast had said, and what the printed chart plus the island's old rule of thumb would have said ---- */
 function emailFor_(p, sheetUrl) {
   var who = p.observer || 'Someone', wet = p.level !== 'dry';
-  var when = p.seen_at ? wallTime_(p.seen_at) : null;
-  // grade against the forecast from EMAIL_LEAD hours before: forecast_in is worked out when the report is sent, by which time it
-  // leans on the gauge's reading of the very tide being reported. Reports from a phone still running the older page
-  // don't carry it, so those fall back to forecast_in
-  var early = num_(p['forecast_' + EMAIL_LEAD + 'h_in']), fc = early != null ? early : num_(p.forecast_in), chart = num_(p.chart_in);
-  var fcWet = fc != null && fc > 0;
+  var when = p.seen_at ? wallTime_(p.seen_at) : null, at = when ? ' at ' + when.time + ' on ' + when.longDay : '';
+  // compare with the forecast from EMAIL_LEAD hours before: forecast_in is worked out when the report is sent, by which
+  // time it leans on the gauge's reading of the very tide being reported. Reports from a phone still running the older
+  // page don't carry the earlier forecasts, so those fall back to forecast_in
+  var early = num_(p['forecast_' + EMAIL_LEAD + 'h_in']), fc = early != null ? early : num_(p.forecast_in);
+  // the printed chart as islanders used it: the road floods when the chart reads OLD_RULE_FT. chart_in is measured from
+  // the road height the page was using (road_ft), so shift it to the old rule's height
+  var chart = num_(p.chart_in), road = num_(p.road_ft), rule = chart == null ? null : chart + ((road != null ? road : 9.92) - OLD_RULE_FT) * 12;
 
   // the same start on every report, so they're easy to search for or filter into a label
   var subject = 'Lt Island - Road Report (' + (p.observer || 'no name') + (when ? ', ' + when.date : '') + ')';
 
-  var lines = [who + ' reported the road ' + (wet ? 'wet' : 'dry') + (when ? ' at ' + when.time + ' on ' + when.longDay : '') + '.', '',
-    'Seen at the road:',
-    '  • ' + (wet ? 'Wet' : 'Dry') + (p.depth_in ? ', about ' + p.depth_in + (Number(p.depth_in) === 1 ? ' inch' : ' inches') + ' over the road (' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ')' : '')];
-  if (p.edge === 'rising') lines.push('  • The water was only just coming over the road');
-  if (p.edge === 'falling') lines.push('  • The water had only just gone off the road');
-  if (fc != null) {
-    lines.push('', 'The forecast for ' + (when ? when.time : 'that time') + (early != null ? ', as it stood ' + EMAIL_LEAD + ' hours before:' : ':'),
-      '  • ' + roadText_(fc, true),
-      '  • ' + verdict_(wet, fcWet, fc, p.depth_in ? Number(p.depth_in) : null));
-  }
-  if (chart != null) lines.push('', 'The printed tide chart had the water ' + roadText_(chart, false) + '.');
+  var depth = num_(p.depth_in), first;
+  if (wet && depth != null) first = who + ' ' + (p.depth_how === 'measured' ? 'measured' : 'estimated') + ' ' + inches_(depth) + ' of water over the road' + at + '.';
+  else first = who + ' reported the road was ' + (wet ? 'wet' : 'dry') + at + '.';
+  if (p.edge === 'rising') first += ' The water was only just coming over the road.';
+  if (p.edge === 'falling') first += ' The water had only just gone off the road.';
+
+  var lines = [first, ''];
+  if (fc != null) lines.push('The forecast' + (early != null ? ', as it stood ' + EMAIL_LEAD + ' hours before,' : '') + ' said the water would be ' + roadText_(fc) + '.');
+  if (rule != null) lines.push('The printed tide chart, with the old ' + OLD_RULE_FT + ' ft rule, said the water would be ' + roadText_(rule) + '.');
   lines.push('', 'Sent at ' + sentAt_(p.reported_at, p.seen_at) + '.');
   if (sheetUrl) lines.push('All reports: ' + sheetUrl);
   return { subject: subject, body: lines.join('\n') };
 }
 
-/* the same comparison the site shows after someone sends a report */
-function verdict_(wet, fcWet, fc, depth) {
-  if (wet && fcWet && depth != null) {
-    var off = depth - fc;
-    return Math.abs(off) <= 3 ? 'Close to the forecast depth' : inches_(Math.abs(off)) + ' ' + (off > 0 ? 'deeper' : 'shallower') + ' than the forecast';
-  }
-  if (wet === fcWet) return Math.abs(fc) <= 6 ? 'Matches the forecast, with the water close to the road’s height' : 'Matches the forecast';
-  if (Math.abs(fc) <= 6) return 'Different from the forecast, but close to the road’s height, so it helps pin down how high the road really is';
-  if (Math.abs(fc) > 24) return 'Far from the forecast, so the time may be off';
-  return 'Different from the forecast, worth a look';
-}
-
-/* inches over the road (negative = below) as words: "about 3 inches over the road", or "just below the road" within an inch */
-function roadText_(x, capital) {
-  var t = (Math.abs(x) < 1 ? 'just' : 'about ' + inches_(Math.abs(x))) + (x > 0 ? ' over' : ' below') + ' the road';
-  return capital ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+/* inches over the road (negative = below) as words: "3 inches over the road", or "just below the road" within an inch */
+function roadText_(x) {
+  return (Math.abs(x) < 1 ? 'just' : inches_(Math.abs(x))) + (x > 0 ? ' over' : ' below') + ' the road';
 }
 
 function num_(v) {

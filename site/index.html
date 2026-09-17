@@ -453,7 +453,7 @@ function sendReport(r){
   var fields={report_id:r.id,seen_at:r.seen_at,level:r.level,edge:r.edge||"",
     depth_in:r.depth_in==null?"":String(r.depth_in),depth_how:r.depth_in==null?"":(r.depth_measured?"measured":"estimate"),
     observer:r.observer||"",forecast_in:r.forecast_in==null?"":String(r.forecast_in),high_tide:r.high_tide||"",reported_at:r.reported_at,
-    forecast_3h_in:num(r.forecast_3h_in),forecast_6h_in:num(r.forecast_6h_in),forecast_24h_in:num(r.forecast_24h_in),chart_in:num(r.chart_in)};
+    forecast_3h_in:num(r.forecast_3h_in),forecast_6h_in:num(r.forecast_6h_in),forecast_24h_in:num(r.forecast_24h_in),chart_in:num(r.chart_in),road_ft:num(r.road_ft)};
   function num(x){return x==null?"":String(x);}
   if(!REPORT_URL)return Promise.reject(new Error("no report address set yet"));
   return fetch(REPORT_URL,{method:"POST",body:new URLSearchParams(fields)})
@@ -532,7 +532,7 @@ function saveReport(f,ctx){
   function r1(o){return o?Math.round(o.inch*10)/10:null;}
   var rec={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),sent:false,seen_at:v,level:f.level.value,depth_in:depth,depth_measured:depth==null?null:f.depth_how.value==="measured",
     edge:f.edge.checked?(wet?"rising":"falling"):null,observer:name||null,
-    forecast_in:fc?Math.round(fc.inch*10)/10:null,forecast_3h_in:r1(M.asOf(ms,3)),forecast_6h_in:r1(M.asOf(ms,6)),forecast_24h_in:r1(M.asOf(ms,24)),chart_in:r1(M.chartAt(ms)),high_tide:ctx&&ctx.h?wallInput(ctx.h.ms):null,
+    forecast_in:fc?Math.round(fc.inch*10)/10:null,forecast_3h_in:r1(M.asOf(ms,3)),forecast_6h_in:r1(M.asOf(ms,6)),forecast_24h_in:r1(M.asOf(ms,24)),chart_in:r1(M.chartAt(ms)),road_ft:T.ROAD,high_tide:ctx&&ctx.h?wallInput(ctx.h.ms):null,
     reported_at:new Date().toISOString()};
   var all=loadReports();all.push(rec);
   try{localStorage.setItem(KEY,JSON.stringify(all));if(name)localStorage.setItem("li-name",name);}catch(e){}
