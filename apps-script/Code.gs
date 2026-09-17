@@ -11,10 +11,11 @@
    After editing this code: Deploy → Manage deployments → edit (pencil) → Version: New version, so the URL stays the same. */
 
 var FIELDS = ['report_id', 'seen_at', 'level', 'edge', 'depth_in', 'depth_how', 'observer', 'forecast_in', 'high_tide', 'reported_at',
-  // added 2026-09-16, always at the end so earlier rows keep their columns: what the page would have said 6 and 24 hours
+  // added 2026-09-16, always at the end so earlier rows keep their columns: what the page would have said 3, 6 and 24 hours
   // before the time seen, and the printed tide chart, all as inches over the road (negative = below it)
-  'forecast_6h_in', 'forecast_24h_in', 'chart_in'];
+  'forecast_3h_in', 'forecast_6h_in', 'forecast_24h_in', 'chart_in'];
 var TZ = 'America/New_York';
+var EMAIL_LEAD = 3;  // which earlier forecast the email compares a report with: 3, 6 or 24 (hours before the time seen)
 var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -54,10 +55,10 @@ function setup() {
 function emailFor_(p, sheetUrl) {
   var who = p.observer || 'Someone', wet = p.level !== 'dry';
   var when = p.seen_at ? wallTime_(p.seen_at) : null;
-  // grade against the forecast from 6 hours before: forecast_in is worked out when the report is sent, by which time it
+  // grade against the forecast from EMAIL_LEAD hours before: forecast_in is worked out when the report is sent, by which time it
   // leans on the gauge's reading of the very tide being reported. Reports from a phone still running the older page
   // don't carry it, so those fall back to forecast_in
-  var early = num_(p.forecast_6h_in), fc = early != null ? early : num_(p.forecast_in), chart = num_(p.chart_in);
+  var early = num_(p['forecast_' + EMAIL_LEAD + 'h_in']), fc = early != null ? early : num_(p.forecast_in), chart = num_(p.chart_in);
   var fcWet = fc != null && fc > 0;
 
   // the same start on every report, so they're easy to search for or filter into a label
@@ -69,7 +70,7 @@ function emailFor_(p, sheetUrl) {
   if (p.edge === 'rising') lines.push('  • The water was only just coming over the road');
   if (p.edge === 'falling') lines.push('  • The water had only just gone off the road');
   if (fc != null) {
-    lines.push('', 'The forecast for ' + (when ? when.time : 'that time') + (early != null ? ', as it stood 6 hours before:' : ':'),
+    lines.push('', 'The forecast for ' + (when ? when.time : 'that time') + (early != null ? ', as it stood ' + EMAIL_LEAD + ' hours before:' : ':'),
       '  • ' + roadText_(fc, true),
       '  • ' + verdict_(wet, fcWet, fc, p.depth_in ? Number(p.depth_in) : null));
   }
