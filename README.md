@@ -39,11 +39,9 @@ No server and no build step.
 |---|---|
 | `apps-script/` | The Google Apps Script that receives road reports and adds each one to a Google Sheet. Setup steps are at the top of the file. |
 | `site/` | **The live site.** `index.html`, `tide-data.js` (data fetching and the forecast model), `base.css`. Edit these directly. |
-| `design-options/` | Design history: the mockups the current layout was chosen from. Not deployed. |
 | `scripts/` | Python analysis: tide and weather history, the road profile, and `backtest_fade.py`, which replays 2024–26 tides to check the forecast. |
 | `data/` | Downloaded data and results (see `data/backtest/results.txt`). |
-| `archive/` | Earlier versions of the live page. |
-| `*.html` (top level) | The original one-page analysis and the September field card for logging when water reaches the road. |
+| `archive/` | Not deployed. Earlier versions of the live page; `design-options/`, the mockups the current layout was chosen from; `original-analysis/`, the first one-page analysis; and `field-card/`, the September 2026 card for logging when water reached the road. |
 
 ## Deploying
 
