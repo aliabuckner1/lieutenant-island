@@ -41,6 +41,6 @@ for yr in range(2005,2027):
             n+=1
     print(f"{yr}: {n} matched high tides", file=sys.stderr)
 
-with open("/Users/aliabuckner/Apollo/lieutenant-island/data/boston_high_tides.csv","w",newline="") as f:
+with open("/Users/aliabuckner/Claude Projects/lieutenant-island/data/boston_high_tides.csv","w",newline="") as f:
     w=csv.DictWriter(f,fieldnames=["pred_time","pred_ft","obs_ft","resid_ft","lag_min"]); w.writeheader(); w.writerows(rows)
 print("TOTAL",len(rows))
