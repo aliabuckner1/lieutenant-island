@@ -129,7 +129,6 @@ html:has(dialog[open]){overflow:hidden}
 .amt{font-family:var(--mono);font-weight:600;font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink-2)}
 .amt.up{color:var(--shut-ink)}
 .amt.down{color:var(--clear-ink)}
-.fine{font-size:12px;color:var(--muted);margin:14px 0 0;line-height:1.45}
 
 /* ---- report the road ---- */
 fieldset{border:0;margin:0;padding:0;min-width:0}
@@ -391,8 +390,6 @@ var STAGE_TXT=["",
   "This is within the next 24 hours, so it leans on what the tide gauge is measuring right now, along with the wind and pressure forecast.",
   "This is within 3 days, so it mostly uses the wind and pressure forecast, which is reliable this far ahead.",
   "This is more than 3 days ahead, so the wind and pressure forecast is less reliable. Expect this to shift as the day gets closer."];
-/* the typical forecast error at each stage, from replaying 2024–26 tides (scripts/backtest_fade.py) */
-var STAGE_ERR=[0,3,4,5];
 function capTxt(E){
   if(!E.model)return (E.beyond?"This is too far ahead for the wind forecast":"The wind and pressure forecast didn’t load")+
     ", so a typical amount is added"+(E.g>0?", along with what the tide gauge is measuring right now.":".");
@@ -488,7 +485,6 @@ function openDetail(it){
     compareHTML(h,pkMs,pkLvl,it.c?{s:it.c.s,e:it.c.e,cut:it.c.s===first}:null)+
     '<div class="sec"><h3>How our forecast differs from the tide chart</h3><p class="cap">'+capTxt(E)+'</p>'+
       partsHTML(E)+'</div>'+
-    '<p class="fine">The forecast is usually within about '+STAGE_ERR[stageOf(E)]+' inches, and the road’s height comes from one tide measured from the road, so give yourself margin.</p>'+
     '<button class="btn wide" type="button" data-act="report">'+REPORT_IC+'Report what you saw at the road</button>');
 }
 
