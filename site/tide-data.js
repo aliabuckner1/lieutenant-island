@@ -200,10 +200,12 @@ function build(r,now){
     series.push({ms:p.ms,astro:p.astro,surge:res*RATIO,lvl:lvl,inch:(lvl-ROAD)*12});
   });
   if(!series.length)throw tideFail();
+  /* a closure starts and ends where the water crosses the road between two 6-minute points, not at the points
+     themselves, so its times agree with the "reopens" line up top */
   var closures=[],cur=null;
-  series.forEach(function(p){
-    if(p.lvl>ROAD){if(!cur)cur={s:p.ms,e:p.ms,pk:p.lvl,pkMs:p.ms};else{cur.e=p.ms;if(p.lvl>cur.pk){cur.pk=p.lvl;cur.pkMs=p.ms;}}}
-    else if(cur){closures.push(cur);cur=null;}});
+  series.forEach(function(p,i){
+    if(p.lvl>ROAD){if(!cur)cur={s:i?cross(series[i-1],p,"lvl",ROAD):p.ms,e:p.ms,pk:p.lvl,pkMs:p.ms};else{cur.e=p.ms;if(p.lvl>cur.pk){cur.pk=p.lvl;cur.pkMs=p.ms;}}}
+    else if(cur){cur.e=cross(series[i-1],p,"lvl",ROAD);closures.push(cur);cur=null;}});
   if(cur)closures.push(cur);
   /* near misses: at each astronomical high water, take the highest water within an hour either side;
      if it stays under the road but comes within NEAR of it, flag it */
@@ -225,6 +227,8 @@ function build(r,now){
 
 
 /* ---- shared helpers for the design options ---- */
+/* when the water crosses `line` between two points a and b, to the nearest minute */
+function cross(a,b,key,line){var f=(line-a[key])/(b[key]-a[key]);return Math.round((a.ms+f*(b.ms-a.ms))/MIN)*MIN;}
 function interp(S,ms){
   if(ms<=S[0].ms)return S[0];if(ms>=S[S.length-1].ms)return S[S.length-1];
   var lo=0,hi=S.length-1;
@@ -236,7 +240,7 @@ function closureAt(M,ms){for(var i=0;i<M.closures.length;i++){var c=M.closures[i
 /* where things stand right now: wet or dry, when that next changes, and the closure that's next */
 function statusNow(M){
   var n=nowW(),S=M.series,cur=interp(S,n),wet=cur.inch>0,change=null,next=null,i;
-  for(i=0;i<S.length;i++){if(S[i].ms<=n)continue;if((S[i].inch>0)!==wet){change=S[i].ms;break;}}
+  for(i=0;i<S.length;i++){if(S[i].ms<=n)continue;if((S[i].inch>0)!==wet){change=i?Math.max(n,cross(S[i-1],S[i],"inch",0)):S[i].ms;break;}}
   /* the next closure worth naming up top: a shallow puddle at the low point isn't one */
   if(!wet)for(i=0;i<M.closures.length;i++)if(M.closures[i].s>n&&(M.closures[i].pk-ROAD)*12>=QUIET_IN){next=M.closures[i];break;}
   return {now:n,inch:cur.inch,lvl:cur.lvl,wet:wet,state:stateFor(cur.inch),change:change,
@@ -345,7 +349,7 @@ function run(o){
   window.addEventListener("pageshow",function(e){if(e.persisted&&Date.now()-last>5*MIN)refresh();});
   document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-last>5*MIN)refresh();});
 }
-window.Tides={load:load,run:run,ROAD:ROAD,NEAR:NEAR,QUIET_IN:QUIET_IN,BRIEF_MIN:BRIEF_MIN,MIN:MIN,HOUR:HOUR,DAY:DAY,STATES:STATES,stateFor:stateFor,
+window.Tides={load:load,cross:cross,run:run,ROAD:ROAD,NEAR:NEAR,QUIET_IN:QUIET_IN,BRIEF_MIN:BRIEF_MIN,MIN:MIN,HOUR:HOUR,DAY:DAY,STATES:STATES,stateFor:stateFor,
   nowW:nowW,parseWall:parseWall,dayStart:dayStart,minOfDay:minOfDay,fmtT:fmtT,fmtD:fmtD,fmtDur:fmtDur,longDur:longDur,
   depthTxt:depthTxt,shortBy:shortBy,interp:interp,closureAt:closureAt,statusNow:statusNow,
   openWindows:openWindows,dayName:dayName,whenTxt:whenTxt,inchesOver:inchesOver,partOfDay:partOfDay,statusLineHTML:statusLineHTML,SLOTS:SLOTS,slotOf:slotOf,slotIndex:slotIndex,slotIcon:slotIcon,highsHTML:highsHTML,slotLabel:slotLabel,rangeTxt:rangeTxt,upcomingForDay:upcomingForDay,slotInfo:slotInfo,freshHTML:freshHTML,errorHTML:errorHTML};

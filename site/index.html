@@ -425,7 +425,7 @@ function windowNear(ms,key,line){
   var a=i,b=i;
   while(a>0&&S[a-1][key]>line)a--;
   while(b<S.length-1&&S[b+1][key]>line)b++;
-  return {s:S[a].ms,e:S[b].ms,cut:a===0};
+  return {s:a?T.cross(S[a-1],S[a],key,line):S[a].ms,e:b<S.length-1?T.cross(S[b],S[b+1],key,line):S[b].ms,cut:a===0};
 }
 /* 26 in / −1 in, from feet over a line */
 function overIn(ft){var n=Math.round(ft*12);return n===0?(ft>0?"<1 in":"just under"):(n<0?"\u2212":"")+Math.abs(n)+" in";}
