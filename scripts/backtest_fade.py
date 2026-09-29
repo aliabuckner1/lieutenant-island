@@ -14,7 +14,8 @@ from zoneinfo import ZoneInfo
 
 D = pathlib.Path(__file__).resolve().parent.parent/'data'
 C = [0.5221, -0.0321, -0.0272, -0.0068, -0.0006, 0.0308]   # the site's surge model
-RATIO, ROAD, TYP = 1.05, 10.40, 0.58
+RATIO, ROAD, TYP = 1.05, 9.92, 0.58   # ROAD: the road's low point in ft above MLLW at Wellfleet, measured from the road 2026-09-15
+RULE = 9.5   # what islanders do: read the printed chart and assume the road floods when it shows this
 HOUR = dt.timedelta(hours=1)
 def P(s): return dt.datetime.strptime(s[:16].replace('T', ' '), '%Y-%m-%d %H:%M')
 
@@ -124,16 +125,25 @@ for d in range(8):
           f"{rmse(e(lambda b, p_, w_: b + PW[0]*p_ + PW[1]*w_)):9.2f}   {bias(ef):+6.1f} / {bias(efd):+6.1f}")
 
 # ================= 3. does the road flood? =================
-print("\n3. DOES THE ROAD FLOOD AT THIS TIDE? (Wellfleet = Boston x 1.05; tides whose actual peak was within 12 in of the road)")
-print(f"{'days':>4} {'n':>4}   % called wrong:  {'chart':>6} {'offset':>7} {'full':>6} {'fade':>6} {'best p/w':>9}")
+# Every forecast is judged against whether the water actually came over the road (9.92 ft at Wellfleet). The baseline
+# is what islanders use: the printed chart with the old 9.5 ft rule. The road's true height doesn't enter that call.
+print(f"\n3. DOES THE ROAD FLOOD AT THIS TIDE? (Wellfleet = Boston x 1.05; road {ROAD} ft; islanders = printed chart + old {RULE} ft rule)")
+print("   % called wrong, tides whose actual peak was within 12 in of the road; then wrong calls over all tides as")
+print("   missed floods / false alarms")
+print(f"{'days':>4} {'n':>4}   {'islanders':>9} {'offset':>7} {'full':>6} {'fade':>6} {'best p/w':>9}   {'all':>4}  {'islanders':>11} {'full':>9} {'fade':>9}")
 for d in range(8):
-    S = [r for r in store[d]['rows'] if abs(RATIO*r[0]['obs'] - ROAD) <= 1.0]
+    A = store[d]['rows']
+    S = [r for r in A if abs(RATIO*r[0]['obs'] - ROAD) <= 1.0]
     PW = store[d]['PW']
-    def wrong(fn):
-        return 100*sum((RATIO*(T_['pred'] + fn(b, p_, w_)) > ROAD) != (RATIO*T_['obs'] > ROAD) for T_, b, p_, w_ in S)/len(S)
-    print(f"{d:>4} {len(S):>4}   {'':>16} {wrong(lambda b, p_, w_: 0.0):6.1f} {wrong(lambda b, p_, w_: b):7.1f} "
-          f"{wrong(lambda b, p_, w_: b + p_ + w_):6.1f} {wrong(lambda b, p_, w_: b + fade(d)*(p_ + w_)):6.1f} "
-          f"{wrong(lambda b, p_, w_: b + PW[0]*p_ + PW[1]*w_):9.1f}")
+    def calls(fn, rows, line=ROAD):
+        """(missed, false alarm) counts: fn gives the forecast surge; flooded if the forecast passes `line`"""
+        said = [(RATIO*(T_['pred'] + fn(b, p_, w_)) > line, RATIO*T_['obs'] > ROAD) for T_, b, p_, w_ in rows]
+        return sum(w and not f for f, w in said), sum(f and not w for f, w in said)
+    def pct(fn, line=ROAD): return 100*sum(calls(fn, S, line))/len(S)
+    def mf(fn, line=ROAD): m, f = calls(fn, A, line); return f"{m:>4} /{f:>4}"
+    isl, full, fd = (lambda b, p_, w_: 0.0), (lambda b, p_, w_: b + p_ + w_), (lambda b, p_, w_: b + fade(d)*(p_ + w_))
+    print(f"{d:>4} {len(S):>4}   {pct(isl, RULE):9.1f} {pct(lambda b, p_, w_: b):7.1f} {pct(full):6.1f} {pct(fd):6.1f} "
+          f"{pct(lambda b, p_, w_: b + PW[0]*p_ + PW[1]*w_):9.1f}   {len(A):>4}  {mf(isl, RULE):>11} {mf(full):>9} {mf(fd):>9}")
 
 # ================= 4. live gauge window =================
 hourly = {}
