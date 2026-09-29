@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tide chart vs our forecast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../site/base.css">
+<style>
+.wrap{max-width:1800px;margin:0 auto;padding:26px 20px 60px}
+.wrap>h1{font-size:28px}
+.lede{color:var(--ink-2);max-width:86ch;margin:8px 0 0;font-size:15px}
+.scen{margin-top:34px}
+.scen>h2{font-family:var(--display);font-size:21px;margin:0}
+.scen>p{margin:4px 0 0;color:var(--ink-2);font-size:14px;max-width:86ch}
+.grid{display:flex;flex-wrap:wrap;gap:26px;margin-top:16px}
+figure{margin:0;width:390px;max-width:100%}
+figcaption .id{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+figcaption b{display:block;font-family:var(--display);font-size:19px;margin-top:2px}
+figcaption p{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:40px}
+.phone{background:#0b161a73;border-radius:26px;padding:70px 0 0;overflow:hidden;box-shadow:var(--shadow)}
+
+/* the details sheet, copied from the live page */
+.sheet{background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;padding:6px 18px 22px}
+.grab{width:38px;height:4px;border-radius:9px;background:var(--rule);margin:4px auto 10px}
+.shhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.kicker{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sheet h2{font-family:var(--display);font-size:22px;line-height:1.2;margin:2px 0 0}
+.x{border:0;background:var(--surface-2);color:var(--ink-2);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.x .ic{width:17px;height:17px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.verdict{margin-top:14px;border-radius:12px;padding:11px 14px}
+.verdict b{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600}
+.verdict small{display:block;font-size:13.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.stat{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.stat span{display:block;font-size:11.5px;color:var(--muted)}
+.stat b{display:block;font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.stat .line{font-family:var(--body);font-size:12.5px;color:var(--ink-2);margin-top:6px;line-height:1.35}
+.stat .line+.line{margin-top:2px}
+.roadref{margin-top:10px;font-size:13px;color:var(--muted)}
+.roadref b{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
+.sec{margin-top:22px}
+.sec h3{font-size:17px;font-weight:700;line-height:1.3;margin:0}
+.cap{font-size:12.5px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+.diff{margin-top:10px;font-size:13.5px;color:var(--ink);background:var(--surface-2);border-radius:10px;padding:8px 11px;line-height:1.4}
+
+/* B: table */
+.cmp{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.cmp th{font-weight:600;text-align:left;font-size:11.5px;color:var(--muted);padding:0 0 6px;vertical-align:bottom;line-height:1.3}
+.cmp th small{display:block;font-weight:400}
+.cmp td{padding:9px 0;white-space:nowrap;border-top:1px solid var(--rule-2);vertical-align:top}
+.cmp td:first-child{color:var(--muted);width:26%;padding-right:8px}
+.cmp td b{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.cmp td small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.cmp .us{padding-left:10px}
+.cmp td:first-child small{font-family:var(--body);font-size:11px}
+.cmp .by{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+
+/* C: timeline */
+.tl{margin-top:14px}
+.tlrow{margin-top:10px}
+.tlrow .lab{font-size:12.5px}
+.tlrow .lab b{font-weight:600}
+.tlrow .lab span{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.track{position:relative;height:18px;background:var(--surface-2);border-radius:6px;margin-top:4px}
+.bar{position:absolute;top:0;bottom:0;border-radius:6px}
+.pk{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);border-radius:2px}
+.axis{position:relative;height:16px;margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.none{position:absolute;inset:0 0 0 8px;display:flex;align-items:center;font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Lieutenant Island · design options</div>
+  <h1>Tide chart vs our forecast, tide by tide</h1>
+  <p class="lede">The details sheet for one high tide, showing what islanders would conclude from the printed tide chart and the
+    old 9.5&nbsp;ft rule next to what our forecast says against the road’s measured height (9.9&nbsp;ft). For each: the highest water and
+    when, how far over (or under) the line it gets, and when the road is underwater. Numbers are from this morning’s live forecast.
+    Only the top of the sheet changes; the “how our forecast differs” section and the report button stay as they are.</p>
+  <div id="out"></div>
+</div>
+<script>
+(function(){
+"use strict";
+var X='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+/* times are minutes after midnight */
+function t(m){var h=Math.floor(m/60),mm=m%60,ap=h<12?"am":"pm";return (h%12||12)+":"+("0"+mm).slice(-2)+ap;}
+function dur(m){var h=Math.floor(m/60),mm=m%60;return h?h+"h"+(mm?" "+mm+"m":""):mm+" min";}
+
+var SCEN=[
+  {title:"Today’s afternoon tide: both say it floods",
+   about:"Both methods agree the road goes under. Ours has it flooding 12 minutes sooner, clearing 6 minutes later and about 4 inches deeper.",
+   kicker:"Today · afternoon",hi:"High tide 1:48pm",hiAt:828,state:"shut",
+   verdict:"Underwater 12:00pm – 3:42pm",vsmall:"Deepest about 30 inches around 1:48pm · 3h 42m in all",
+   isl:{ft:11.7,at:828,over:26,s:732,e:936},
+   us:{ft:12.4,at:828,over:30,s:720,e:942},
+   span:[660,1000],ticks:[720,780,840,900,960],
+   diff:"We expect it to flood <b>12 min sooner</b>, clear <b>6 min later</b> and run about <b>4 in deeper</b> than the tide chart suggests."},
+  {title:"Saturday’s early-morning tide: they disagree",
+   about:"The case that matters most. The tide chart peaks an inch under the 9.5 ft line, so an islander would expect a dry road; our forecast has a thin film over it for about 40 minutes.",
+   kicker:"Saturday · early morning",hi:"High tide 5:05am",hiAt:305,state:"wet",
+   verdict:"Underwater 4:48am – 5:30am",vsmall:"Barely over the road, about 1 inch around 5:06am · 42 min in all",
+   isl:{ft:9.4,at:305,over:-1,s:null,e:null},
+   us:{ft:10.0,at:306,over:1,s:288,e:330},
+   span:[240,375],ticks:[240,270,300,330,360],
+   diff:"The tide chart says the road <b>stays dry</b> (1 in short). We expect about <b>1 in over it for 42 min</b>."}
+];
+var COLORS={shut:"#d03b3b",wet:"var(--wet)"};
+
+function overTxt(i,line){return Math.abs(i)<1?"right at "+line:Math.abs(i)+" in "+(i>0?"over ":"under ")+line;}
+function winTxt(o){return o.s==null?"Stays dry":t(o.s)+" – "+t(o.e);}
+function head(s){return '<div class="grab"></div><div class="shhead"><div><div class="kicker">'+s.kicker+'</div><h2>'+s.hi+
+  '</h2></div><button class="x" type="button" aria-label="Close">'+X+'</button></div>'+
+  '<div class="verdict" style="background:var(--'+s.state+'-bg)"><b><i class="dot" style="background:'+COLORS[s.state]+'"></i>'+s.verdict+
+  '</b><small>'+s.vsmall+'</small></div>';}
+function stat(l,v,sub,lines){return '<div class="stat"><span>'+l+'</span><b>'+v+'</b><small>'+sub+'</small>'+(lines||[]).map(function(x){
+  return '<div class="line">'+x+'</div>';}).join('')+'</div>';}
+var TAIL='<div class="sec"><h3>How our forecast differs from the tide chart</h3><p class="cap">…unchanged from today’s page</p></div>';
+
+var OPTIONS=[
+  {id:"now",name:"Today’s page",about:"Two heights and the road’s height. Nothing says when either one floods, and the chart is compared with 9.9 ft, not the 9.5 ft rule islanders use.",
+   body:function(s){return '<div class="stats">'+stat("Tide chart",s.isl.ft.toFixed(1)+" ft",t(s.isl.at))+stat("Our forecast",s.us.ft.toFixed(1)+" ft",t(s.us.at))+'</div>'+
+     '<div class="roadref">Road floods above <b>9.9 ft</b></div>';}},
+  {id:"A",name:"Fuller cards",about:"The same two cards, each saying how far over its own line the water gets and when the road is underwater. Smallest change to the page.",
+   body:function(s){return '<div class="stats">'+
+     stat("Tide chart · 9.5 ft rule",s.isl.ft.toFixed(1)+" ft",t(s.isl.at),[overTxt(s.isl.over,"9.5 ft"),"<b>"+winTxt(s.isl)+"</b>"])+
+     stat("Our forecast · road 9.9 ft",s.us.ft.toFixed(1)+" ft",t(s.us.at),[overTxt(s.us.over,"the road"),"<b>"+winTxt(s.us)+"</b>"])+'</div>';}},
+  {id:"B",name:"Side-by-side table",about:"A row per question, so each answer lines up with the other. Two rows: the highest water (with how far over the line in brackets) and when the road is underwater. Adds one plain sentence saying what the difference means.",
+   body:function(s){
+     /* the peak time is only shown when it's off the high tide time in the title by more than 10 minutes */
+     function hw(o){return "<b>"+o.ft.toFixed(1)+" ft</b> <span class=\"by\">("+(o.over<0?"\u2212":"")+Math.abs(o.over)+" in)</span>"+
+       (Math.abs(o.at-s.hiAt)>10?"<small>at "+t(o.at)+"</small>":"");}
+     /* 12:12–3:36pm: one am/pm when both ends share it */
+     function win(o){if(o.s==null)return "<b>Stays dry</b>";var a=t(o.s),b=t(o.e);
+       return "<b>"+(a.slice(-2)===b.slice(-2)?a.slice(0,-2):a)+"–"+b+"</b>";}
+     function r(l,a,b){return '<tr><td>'+l+'</td><td>'+a+'</td><td class="us">'+b+'</td></tr>';}
+     return '<table class="cmp"><tr><th></th><th>Tide chart<small>9.5 ft rule</small></th><th class="us">Our forecast<small>road at 9.9 ft</small></th></tr>'+
+       r("Highest",hw(s.isl),hw(s.us))+
+       r("Underwater",win(s.isl),win(s.us))+
+       '</table><div class="diff">'+s.diff+'</div>';}},
+  {id:"C",name:"Timeline",about:"The two underwater windows drawn on one clock, with a tick at each peak, so a sooner start or a disagreement shows at a glance.",
+   body:function(s){var a=s.span[0],w=s.span[1]-s.span[0];function pc(m){return ((m-a)/w*100).toFixed(1)+"%";}
+     function row(lab,o,col,line){return '<div class="tlrow"><div class="lab"><b>'+lab+'</b><span>'+o.ft.toFixed(1)+' ft at '+t(o.at)+' · '+overTxt(o.over,line)+'</span></div>'+
+       '<div class="track">'+(o.s==null?'<div class="none">stays dry</div>':'<div class="bar" style="left:'+pc(o.s)+';width:calc('+pc(o.e)+' - '+pc(o.s)+');background:'+col+'"></div>')+
+       '<div class="pk" style="left:'+pc(o.at)+'"></div></div></div>';}
+     return '<div class="tl">'+row("Tide chart · 9.5 ft rule",s.isl,"var(--muted)","9.5 ft")+row("Our forecast · road 9.9 ft",s.us,COLORS[s.state],"road")+
+       '<div class="axis">'+s.ticks.map(function(m){return '<span style="left:'+pc(m)+'">'+t(m).replace(":00","")+'</span>';}).join("")+'</div></div>'+
+       '<div class="diff">'+s.diff+'</div>';}}
+];
+
+document.getElementById("out").innerHTML=SCEN.map(function(s){
+  return '<section class="scen"><h2>'+s.title+'</h2><p>'+s.about+'</p><div class="grid">'+OPTIONS.map(function(o){
+    return '<figure><figcaption><div class="id">'+(o.id==="now"?"For comparison":"Option "+o.id)+'</div><b>'+o.name+'</b><p>'+o.about+'</p></figcaption>'+
+      '<div class="phone"><div class="sheet">'+head(s)+o.body(s)+TAIL+'</div></div></figure>';}).join("")+'</div></section>';
+}).join("");
+})();
+</script>
+</body>
+</html>

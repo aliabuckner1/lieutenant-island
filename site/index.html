@@ -108,6 +108,16 @@ html:has(dialog[open]){overflow:hidden}
 .stat b{display:block;font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.3}
 .stat small{font-family:var(--mono);font-size:11px;color:var(--muted)}
 /* the road isn't a third measurement, it's the fixed line both are judged against */
+.cmp{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.cmp th{font-weight:600;text-align:left;font-size:11.5px;color:var(--muted);padding:0 0 6px;vertical-align:bottom;line-height:1.3}
+.cmp th small{display:block;font-weight:400}
+.cmp td{padding:9px 0;border-top:1px solid var(--rule-2);vertical-align:top;white-space:nowrap}
+.cmp td:first-child{color:var(--muted);width:26%;padding-right:8px}
+.cmp td b{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.cmp td small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.cmp .us{padding-left:10px}
+.cmp .by{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.diff{margin-top:10px;font-size:13.5px;background:var(--surface-2);border-radius:10px;padding:8px 11px;line-height:1.4}
 .roadref{margin-top:10px;font-size:13px;color:var(--muted)}
 .roadref b{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
 .sec{margin-top:22px}
@@ -406,6 +416,49 @@ function partsHTML(E){
     whyRow("Air pressure",Math.round(E.mb)+"\u00a0mb · "+effect(by.pressure),by.pressure)+
     whyRow("Wind",windTxt(E).replace(/^c/,"C")+" · "+effect(by.wind),by.wind);
 }
+/* ---- the tide chart as islanders read it, next to our forecast ----
+   Islanders read the printed chart and take the road as flooded once it shows RULE ft. That, not the road's measured
+   height, is what our forecast is compared with: the point is to beat what people on the island actually use. */
+var RULE=9.5;
+/* when the road is underwater around one moment by a curve (p.astro for the chart, p.lvl for ours) against a line */
+function windowNear(ms,key,line){
+  var S=M.series,i=0,best=Infinity;
+  S.forEach(function(p,k){var d=Math.abs(p.ms-ms);if(d<best){best=d;i=k;}});
+  if(!(S[i][key]>line))return null;
+  var a=i,b=i;
+  while(a>0&&S[a-1][key]>line)a--;
+  while(b<S.length-1&&S[b+1][key]>line)b++;
+  return {s:S[a].ms,e:S[b].ms,cut:a===0};
+}
+/* 26 in / −1 in, from feet over a line */
+function overIn(ft){var n=Math.round(ft*12);return n===0?(ft>0?"<1 in":"just under"):(n<0?"\u2212":"")+Math.abs(n)+" in";}
+/* the two rows (highest water, underwater) and a sentence on how they differ */
+function compareHTML(h,pkMs,pkLvl,ours){
+  var cMs=h?h.ms:pkMs,cLvl=h?h.v:T.interp(M.series,pkMs).astro,chart=windowNear(cMs,"astro",RULE),head=h?h.ms:pkMs;
+  function hw(ft,ms,over){return "<b>"+ft.toFixed(1)+" ft</b> <span class=\"by\">("+over+")</span>"+
+    (Math.abs(ms-head)>10*T.MIN?"<small>at "+T.fmtT(ms)+"</small>":"");}
+  function win(w){return w?"<b>"+T.rangeTxt(w.s,w.e)+"</b>":"<b>Stays dry</b>";}
+  function r(l,a,b){return '<tr><td>'+l+'</td><td>'+a+'</td><td class="us">'+b+'</td></tr>';}
+  var cOver=cLvl-RULE,uOver=pkLvl-T.ROAD,diff;
+  function mins(x){return Math.round(Math.abs(x)/T.MIN);}
+  if(chart&&ours){
+    var bits=[],ds=chart.s-ours.s,de=ours.e-chart.e,dd=Math.round((uOver-cOver)*12);
+    if(!ours.cut&&!chart.cut&&mins(ds)>=5)bits.push("flood <b>"+mins(ds)+" min "+(ds>0?"sooner":"later")+"</b>");
+    if(mins(de)>=5)bits.push("clear <b>"+mins(de)+" min "+(de>0?"later":"sooner")+"</b>");
+    if(Math.abs(dd)>=2)bits.push("run about <b>"+Math.abs(dd)+" in "+(dd>0?"deeper":"shallower")+"</b>");
+    diff=bits.length?"We expect it to "+(bits.length>1?bits.slice(0,-1).join(", ")+" and "+bits[bits.length-1]:bits[0])+" than the tide chart suggests."
+      :"About the same as the tide chart suggests.";
+  }else if(ours){
+    diff="The tide chart says the road <b>stays dry</b> ("+overIn(-cOver).replace("just under","right at the line")+" short). We expect <b>"+
+      (uOver*12<1?"under an inch":"about "+Math.round(uOver*12)+" in")+" over it for "+T.fmtDur((ours.e-ours.s)/T.MIN)+"</b>.";
+  }else if(chart){
+    diff="The tide chart says the road <b>floods "+T.rangeTxt(chart.s,chart.e)+"</b>. We expect it to <b>stay "+
+      (uOver*12>-1?"just":Math.round(-uOver*12)+" in")+" below</b> the road.";
+  }else diff="The tide chart agrees: the road stays dry.";
+  return '<table class="cmp"><tr><th></th><th>Tide chart<small>'+RULE+' ft rule</small></th><th class="us">Our forecast<small>road at '+T.ROAD.toFixed(1)+' ft</small></th></tr>'+
+    r("Highest",hw(cLvl,cMs,overIn(cOver)),hw(pkLvl,pkMs,overIn(uOver)))+
+    r("Underwater",win(chart),win(ours))+'</table><div class="diff">'+diff+'</div>';
+}
 function openDetail(it){
   if(!M)return;
   var n=T.nowW(),first=M.series[0].ms,h,pkMs,pkLvl,slot,verdict;
@@ -415,7 +468,7 @@ function openDetail(it){
     verdict='<div class="verdict" style="background:var(--'+st.cls+'-bg)"><b><i class="dot" style="background:'+st.color+'"></i>'+
       (on?"Underwater now":"Underwater "+(c.s===first?"until "+T.fmtT(c.e):T.rangeTxt(c.s,c.e)))+'</b><small>'+
       (on?"Reopens "+T.whenTxt(c.e,n)+" · ":"")+(inch<1?"Barely over the road":"Deepest about "+inchesTxt(inch))+" around "+T.fmtT(c.pkMs)+
-      (on?"":" · "+T.fmtDur((c.e-c.s)/T.MIN)+" in all")+'</small></div>';
+      (on?"":" · "+T.fmtDur((c.e-c.s)/T.MIN))+'</small></div>';
   }else if(it.x){
     var x=it.x;
     h=x._h;pkMs=x.ms;pkLvl=x.lvl;slot=T.SLOTS[T.slotOf(x.ms)].n;
@@ -432,9 +485,7 @@ function openDetail(it){
   CTX={h:h||null};
   var E=M.explain(pkMs);
   show(headHTML(T.dayName(it.k,n)+" · "+slot.toLowerCase(),h?"High tide "+T.fmtT(h.ms):"Closure")+verdict+
-    '<div class="stats">'+stat("Tide chart",h?h.v.toFixed(1)+" ft":"—",h?T.fmtT(h.ms):"")+
-      stat("Our forecast",pkLvl.toFixed(1)+" ft",T.fmtT(pkMs))+'</div>'+
-    '<div class="roadref">Road floods above <b>'+T.ROAD.toFixed(1)+' ft</b></div>'+
+    compareHTML(h,pkMs,pkLvl,it.c?{s:it.c.s,e:it.c.e,cut:it.c.s===first}:null)+
     '<div class="sec"><h3>How our forecast differs from the tide chart</h3><p class="cap">'+capTxt(E)+'</p>'+
       partsHTML(E)+'</div>'+
     '<p class="fine">The forecast is usually within about '+STAGE_ERR[stageOf(E)]+' inches, and the road’s height comes from one tide measured from the road, so give yourself margin.</p>'+
