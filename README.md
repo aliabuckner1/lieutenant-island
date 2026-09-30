@@ -31,9 +31,10 @@ measured:
 The page runs entirely in the browser. On every load it fetches NOAA tide predictions, the live Boston tide gauge, the NWS wind
 forecast and Open-Meteo pressure, then compares the result with the road's low point: 9.9 ft above MLLW, measured from the road on 15 Sep 2026
 (nine tape-measure depths through one tide, `data/road_measurements.csv`). It had been 10.4 ft from lidar, good to about ±6 in.
-No server and no build step. Between NOAA's high and low times the curve is Boston's, stretched to fit, with a sharper top: against
-the USGS harbor gauge (2017–22) Wellfleet's tide reaches road height about 6 min later on the way in and leaves it about 8 min
-earlier on the way out than Boston's shape says (`scripts/wellfleet_shape.py`, `data/wellfleet_shape/results.txt`).
+No server and no build step. Between NOAA's high and low times the curve is Boston's, stretched to fit, with a quicker fall off the top: against
+the USGS harbor gauge (2017–22) Wellfleet's tide leaves road height about 8 min earlier on the way out than Boston's shape says
+(`scripts/wellfleet_shape.py`, `data/wellfleet_shape/results.txt`). The gauge also showed the rise running 6 min later, but depths
+measured at the road on the rising tide fit the unshifted curve, so only the fall is adjusted.
 
 ## What's where
 

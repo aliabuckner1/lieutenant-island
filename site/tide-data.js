@@ -8,9 +8,11 @@ var ROAD=9.92, RATIO=1.05, TYP=0.58, DAYS=8, NEAR=0.5;  /* near miss = peak with
 /* a closure peaking under QUIET_IN inches is a puddle at the low point rather than a crossing to avoid, so it's shown
    quietly; one lasting BRIEF_MIN minutes or less just says "briefly", since its start and end are within our timing error */
 var QUIET_IN=2, BRIEF_MIN=15;
-/* the harbor's pointier top (see the curve warp below): minutes later on the rise and earlier on the fall, reached by
-   SHAPE_FT below the high */
-var SHAPE_RISE=6, SHAPE_FALL=8, SHAPE_FT=2;
+/* the harbor's quicker fall off the top (see the curve warp below): minutes earlier on the fall, reached by SHAPE_FT
+   below the high. The harbor gauge also showed the rise running 6 min later, but at the road it doesn't: tape depths
+   through the rising side on 2026-09-15 and every 1–2 min on 2026-09-30 fit the unshifted curve to within half an
+   inch (data/road_measurements.csv), so the rise is left alone */
+var SHAPE_RISE=0, SHAPE_FALL=8, SHAPE_FT=2;
 var C=[0.5221,-0.0321,-0.0272,-0.0068,-0.0006,0.0308];
 var TZ="America/New_York", LAT=41.8937, LON=-70.0034;
 var NOAA="https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
@@ -100,11 +102,10 @@ function build(r,now){
     var b1=pairs[k][0],w1=pairs[k][1],b2=pairs[k+1][0],w2=pairs[k+1][1];
     if(b2.ms<=b1.ms||Math.abs(b2.v-b1.v)<1e-9)return;
     var f=(s.ms-b1.ms)/(b2.ms-b1.ms);
-    /* Wellfleet's tide has a pointier top than Boston's: near high water it rises and falls faster. Against the USGS
-       harbor gauge (2017–22, 1,085 road-flooding tides), the stretched Boston curve reaches a level 2 ft below the high
-       about 6 min too early on the way in and leaves it about 8 min too late on the way out, and the gap shrinks
-       roughly with the square root of the distance below the high (data/wellfleet_shape/results.txt). So each point
-       is nudged in time by that much, later before the high and earlier after it */
+    /* Wellfleet's tide falls off its top faster than Boston's. Against the USGS harbor gauge (2017–22, 1,085
+       road-flooding tides), the stretched Boston curve leaves a level 2 ft below the high about 8 min too late on the
+       way out, and the gap shrinks roughly with the square root of the distance below the high
+       (data/wellfleet_shape/results.txt). So each point after the high is nudged earlier by that much */
     var hi=b1.ty==="H"?w1:w2,d=Math.max(0,Math.min(hi.v-(w1.v+(s.v-b1.v)*(w2.v-w1.v)/(b2.v-b1.v)),SHAPE_FT)),
       nudge=Math.sqrt(d/SHAPE_FT)*(b1.ty==="H"?-SHAPE_FALL:SHAPE_RISE)*MIN;
     warped.push({ms:w1.ms+f*(w2.ms-w1.ms)+nudge,v:w1.v+(s.v-b1.v)*(w2.v-w1.v)/(b2.v-b1.v)});
