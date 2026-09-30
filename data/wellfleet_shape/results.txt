@@ -52,5 +52,6 @@ Road-flooding tides, 1.5 ft below the high, actual minus site, minutes (rise / f
    summer: rise  -5.6   fall  -8.0   (n=264)
    autumn: rise  -6.0   fall  -5.3   (n=312)
 
-The site (site/tide-data.js, SHAPE_RISE/SHAPE_FALL) nudges the stretched curve 6 min later on the rise and 8 min earlier on the
-fall at 2 ft below the high, scaled by the square root of the distance below the high.
+The site (site/tide-data.js, SHAPE_FALL) nudges the stretched curve 8 min earlier on the fall at 2 ft below the high, scaled by
+the square root of the distance below the high. The rise is left alone: depths measured at the road fit the unshifted curve
+(data/road_measurements.csv, 2026-09-30).
