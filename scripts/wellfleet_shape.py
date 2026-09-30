@@ -187,4 +187,4 @@ print("\nRoad-flooding tides, 1.5 ft below the high, actual minus site, minutes 
 for b in ['2017','2018','2019','2020','2021','2022','winter','spring','summer','autumn']:
     r, f = res2.get((b,'rise'),[]), res2.get((b,'fall'),[])
     if r: print(f"  {b:>7}: rise {st.median(r):+5.1f}   fall {st.median(f):+5.1f}   (n={len(r)})")
-print("\nThe site (site/tide-data.js, SHAPE_FALL) nudges the stretched curve 8 min earlier on the fall at 2 ft below the high, scaled by\nthe square root of the distance below the high. The rise is left alone: depths measured at the road fit the unshifted curve\n(data/road_measurements.csv, 2026-09-30).")
+print("\nThe site (site/tide-data.js, SHAPE_FALL) pulls the stretched curve earlier after the high, by 14 min at 2 ft below it, scaled by\nthe square root of the distance below the high: at the road (data/road_measurements.csv, 2026-09-29/30) the fall ran 14 min ahead of\nthe curve, while the rise fit it, so the rise is left alone.")
