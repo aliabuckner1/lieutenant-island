@@ -1,3 +1,8 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+# wellfleet_shape.py re-downloads these (about 45 MB)
+data/wellfleet_shape/usgs_*.rdb
+data/wellfleet_shape/boston_obs.csv
+data/wellfleet_shape/hilo_*.json
